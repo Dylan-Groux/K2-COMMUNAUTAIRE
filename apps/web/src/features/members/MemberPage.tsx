@@ -1,6 +1,5 @@
 import { useParams } from "react-router"
 import { Shell } from "@/components/layout/Shell"
-import { Rank } from "@/components/Rank"
 import { StatusMessage } from "@/components/StatusMessage"
 import { useMember } from "@/features/games/queries"
 import { errorMessage } from "@/lib/api-client"
@@ -31,9 +30,6 @@ export function MemberPage() {
                 {!a.isMain && <span className="smurf-badge">SMURF</span>}
               </h2>
               <p className="mt-2 text-white/40">{a.identifier}</p>
-              <div className="mt-4">
-                <Rank account={a} />
-              </div>
               {a.friendCode && (
                 <p className="mt-2 text-sm text-[#9da4ff]">
                   Code ami : {a.friendCode}

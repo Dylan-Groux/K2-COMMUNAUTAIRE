@@ -67,7 +67,7 @@ export default function LorePage() {
       <p className="eyebrow">Lore QLS</p>
       <h1 className="page-title">{SERIES}.</h1>
       <p className="mt-6 max-w-xl text-white/50">
-        L'histoire du serveur, en manga. Six inconnus, quatorze jours, et
+        L'histoire du serveur, en manga. Des inconnus, quatorze jours, et
         quelqu'un qui lit leur histoire avant eux.
       </p>
       <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

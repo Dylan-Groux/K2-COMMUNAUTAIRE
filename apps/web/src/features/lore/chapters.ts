@@ -18,7 +18,7 @@ export const CHAPTERS: Chapter[] = [
     slug: "chapitre-1",
     title: "Le Commencement",
     summary:
-      "Six inconnus, six vies ordinaires, et le même morceau de photo glissé dans leur journée : « Gare — 23:59 ». Cette nuit-là, le cycle commence.",
+      "Des inconnus, des vies ordinaires, et le même morceau de photo glissé dans leur journée : « Gare — 23:59 ». Cette nuit-là, le cycle commence.",
     pdf: "/lore/chapitre-01-le-commencement.pdf",
     pages: 67,
   },

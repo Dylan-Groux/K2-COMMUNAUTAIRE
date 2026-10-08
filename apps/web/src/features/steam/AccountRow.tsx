@@ -1,9 +1,8 @@
 import { useState } from "react"
 import { Link } from "react-router"
 import type { GameAccount } from "@k2/shared"
-import { Rank } from "@/components/Rank"
 
-/** Un compte de jeu d'un membre : rang, pseudo en jeu, lien tracker ou code ami. */
+/** Un compte de jeu d'un membre : pseudo en jeu, lien tracker ou code ami. */
 export function AccountRow({ account }: { account: GameAccount }) {
   const [copied, setCopied] = useState(false)
 
@@ -15,7 +14,6 @@ export function AccountRow({ account }: { account: GameAccount }) {
 
   return (
     <div className="member-row">
-      <Rank account={account} />
       <div className="min-w-0 flex-1">
         <Link
           to={`/membre/${encodeURIComponent(account.pseudo)}`}

@@ -66,43 +66,6 @@ button {
   backdrop-filter: blur(20px);
 }
 
-.rank-block {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  min-width: 9rem;
-}
-
-.rank-gem {
-  width: 2.2rem;
-  height: 2.2rem;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 0.7rem 1rem 0.7rem 1rem;
-  background: linear-gradient(145deg, #5865f2, #22263e);
-  box-shadow: 0 0 22px rgba(88, 101, 242, 0.22);
-  transform: rotate(8deg);
-}
-
-.rank-diamond {
-  background: linear-gradient(145deg, #9df1ff, #547ac8);
-}
-.rank-emerald {
-  background: linear-gradient(145deg, #4fffb0, #087b5f);
-}
-.rank-platinum {
-  background: linear-gradient(145deg, #78d8d3, #416e91);
-}
-.rank-ascendant {
-  background: linear-gradient(145deg, #7affac, #326d64);
-}
-.rank-champion {
-  background: linear-gradient(145deg, #bd7cff, #5b2f88);
-}
-.rank-or {
-  background: linear-gradient(145deg, #ffd66b, #9a6720);
-}
-
 .smurf-badge {
   display: inline-flex;
   margin-left: 0.35rem;
@@ -113,14 +76,6 @@ button {
   letter-spacing: 0.12em;
   color: #aeb4ff;
   vertical-align: middle;
-}
-
-.rank-select {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.7rem;
-  background: #111117;
-  padding: 0.7rem;
-  color: white;
 }
 
 .delete-button {

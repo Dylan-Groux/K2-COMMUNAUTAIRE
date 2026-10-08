@@ -1,0 +1,23 @@
+# Apache (o2switch) : copié tel quel dans dist/ par Vite, donc à la racine du site.
+
+RewriteEngine On
+
+# bot/ est écrit par le bot QLS (EXPORT_DIR) : jamais redirigé vers le site.
+# Tant que le bot n'y écrit rien, /bot/widget.json répond 404 et l'accueil reste sur les données d'exemple.
+RewriteRule ^bot/ - [L]
+
+# Application React : toute route inconnue (/lore/chapitre-1, /steam/valorant…) renvoie index.html.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
+
+<IfModule mod_headers.c>
+  # Fichiers Vite nommés avec leur empreinte : leur contenu ne change jamais.
+  <If "%{REQUEST_URI} =~ m#^/assets/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+  # index.html et les JSON du bot (réécrits chaque minute) : toujours revalider.
+  <If "%{REQUEST_URI} == '/' || %{REQUEST_URI} =~ m#\.html$# || %{REQUEST_URI} =~ m#^/bot/.*\.json$#">
+    Header set Cache-Control "no-cache"
+  </If>
+</IfModule>

@@ -1,6 +1,7 @@
 import request from "supertest"
 import { describe, expect, it } from "vitest"
 import type { GameAccount } from "@k2/shared"
+import { seedMembers } from "../src/db/seed"
 import { setupApp } from "./helpers"
 
 describe("API publique", () => {
@@ -42,5 +43,25 @@ describe("répertoire public", () => {
     const res = await request(app).get("/api/members/RedarDG")
     expect(res.body.member.accounts).toHaveLength(7)
     expect((await request(app).get("/api/members/inconnu")).status).toBe(404)
+  })
+})
+
+describe("seed", () => {
+  it("publie les profils Steam des membres, sans doublon si relancé", async () => {
+    const { app, db } = setupApp()
+    expect(seedMembers(db)).toEqual([])
+    const res = await request(app).get("/api/games/steam/accounts")
+    expect(res.body.accounts.map((a: GameAccount) => a.pseudo).sort()).toEqual([
+      "Alex",
+      "JLB",
+      "Neroo",
+      "RedarDG",
+      "Semajike",
+    ])
+    expect(
+      res.body.accounts.every((a: GameAccount) =>
+        a.url?.startsWith("https://steamcommunity.com/"),
+      ),
+    ).toBe(true)
   })
 })

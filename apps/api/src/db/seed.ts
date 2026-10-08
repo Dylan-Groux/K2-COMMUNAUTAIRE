@@ -9,111 +9,125 @@ import { openDatabase, transaction, type Database } from "./database"
 
 export const DEMO_PSEUDO = "RedarDG"
 
-type DemoAccount = Omit<
-  NewAccountRow,
-  "id" | "rankUpdatedAt" | "url" | "friendCode" | "rankDivision" | "rankLp"
-> &
-  Partial<Pick<NewAccountRow, "url" | "friendCode" | "rankDivision" | "rankLp">>
+/** V1 : uniquement des liens (tracker, profil Steam) ou des codes amis, pas de rang. */
+type SeedAccount = Pick<NewAccountRow, "slug" | "identifier" | "isMain"> &
+  Partial<Pick<NewAccountRow, "url" | "friendCode">>
 
-const demoAccounts: DemoAccount[] = [
+type SeedMember = { pseudo: string; accounts: SeedAccount[] }
+
+const steam = (identifier: string, url: string): SeedAccount => ({
+  slug: "steam",
+  identifier,
+  url,
+  isMain: true,
+})
+
+export const MEMBERS: SeedMember[] = [
   {
-    slug: "league-of-legends",
-    identifier: "SOREDAR#EUW",
-    url: "https://tracker.gg/lol/profile/riot/SOREDAR%23EUW/overview",
-    isMain: true,
-    rankTier: "Diamond",
-    rankDivision: "II",
-    rankLp: 64,
-    rankDeclared: false,
+    pseudo: DEMO_PSEUDO,
+    accounts: [
+      {
+        slug: "league-of-legends",
+        identifier: "SOREDAR#EUW",
+        url: "https://tracker.gg/lol/profile/riot/SOREDAR%23EUW/overview",
+        isMain: true,
+      },
+      { slug: "league-of-legends", identifier: "Redarito#K2", isMain: false },
+      {
+        slug: "valorant",
+        identifier: "SOREDAR#EUW",
+        url: "https://tracker.gg/valorant/profile/riot/SOREDAR%23EUW/overview",
+        isMain: true,
+      },
+      {
+        slug: "apex-legends",
+        identifier: "Redarito · PC",
+        url: "https://apex.tracker.gg/apex/profile/origin/Redarito/overview",
+        isMain: true,
+      },
+      {
+        slug: "rocket-league",
+        identifier: "Redarcatovichéé",
+        url: "https://rocketleague.tracker.network/rocket-league/profile/epic/Redarcatovich%C3%A9%C3%A9/overview",
+        isMain: true,
+      },
+      {
+        slug: "aniimo",
+        identifier: "RedarDG",
+        friendCode: "1254896574",
+        isMain: true,
+      },
+      steam(
+        "RedarDG",
+        "https://steamcommunity.com/profiles/76561199509396038/",
+      ),
+    ],
   },
   {
-    slug: "league-of-legends",
-    identifier: "Redarito#K2",
-    isMain: false,
-    rankTier: "Emerald",
-    rankDivision: "I",
-    rankLp: 28,
-    rankDeclared: false,
+    pseudo: "Alex",
+    accounts: [
+      steam("styZR36365", "https://steamcommunity.com/id/styZR36365/"),
+    ],
   },
   {
-    slug: "valorant",
-    identifier: "SOREDAR#EUW",
-    url: "https://tracker.gg/valorant/profile/riot/SOREDAR%23EUW/overview",
-    isMain: true,
-    rankTier: "Ascendant",
-    rankDivision: "2",
-    rankLp: 71,
-    rankDeclared: false,
+    pseudo: "Neroo",
+    accounts: [
+      steam("Neroo", "https://steamcommunity.com/profiles/76561199203719707/"),
+    ],
   },
   {
-    slug: "apex-legends",
-    identifier: "Redarito · PC",
-    url: "https://apex.tracker.gg/apex/profile/origin/Redarito/overview",
-    isMain: true,
-    rankTier: "Platinum",
-    rankDivision: "I",
-    rankLp: 824,
-    rankDeclared: false,
+    pseudo: "JLB",
+    accounts: [
+      steam("JLB", "https://steamcommunity.com/profiles/76561198280539202/"),
+    ],
   },
   {
-    slug: "rocket-league",
-    identifier: "Redarcatovichéé",
-    url: "https://rocketleague.tracker.network/rocket-league/profile/epic/Redarcatovich%C3%A9%C3%A9/overview",
-    isMain: true,
-    rankTier: "Champion",
-    rankDivision: "II",
-    rankDeclared: true,
-  },
-  {
-    slug: "aniimo",
-    identifier: "RedarDG",
-    friendCode: "1254896574",
-    isMain: true,
-    rankTier: "Or",
-    rankDivision: "III",
-    rankDeclared: true,
-  },
-  {
-    slug: "steam",
-    identifier: "RedarDG",
-    url: "https://steamcommunity.com/profiles/76561199509396038/",
-    isMain: true,
-    rankTier: "Niveau 42",
-    rankDeclared: true,
+    pseudo: "Semajike",
+    accounts: [
+      steam(
+        "Semajike",
+        "https://steamcommunity.com/profiles/76561199197531909/",
+      ),
+    ],
   },
 ]
 
-/** Crée le membre de démo et ses comptes s'il n'existe pas encore. */
-export function seedDemo(db: Database) {
+/** Ajoute les membres absents de la base, avec leurs comptes. Relançable sans doublon. Renvoie les pseudos ajoutés. */
+export function seedMembers(db: Database, members = MEMBERS) {
   const users = createUsersRepository(db)
-  if (users.findByPseudo(DEMO_PSEUDO)) return false
-
   const accounts = createAccountsRepository(db)
   const now = new Date().toISOString()
+  const created: string[] = []
 
   transaction(db, () => {
-    const user = users.create(DEMO_PSEUDO)
-    for (const account of demoAccounts) {
-      accounts.insert(user.id, {
-        url: null,
-        friendCode: null,
-        rankDivision: null,
-        rankLp: null,
-        ...account,
-        id: randomUUID(),
-        rankUpdatedAt: now,
-      })
+    for (const member of members) {
+      if (users.findByPseudo(member.pseudo)) continue
+      const user = users.create(member.pseudo)
+      for (const account of member.accounts) {
+        accounts.insert(user.id, {
+          url: null,
+          friendCode: null,
+          rankTier: "",
+          rankDivision: null,
+          rankLp: null,
+          rankDeclared: true,
+          ...account,
+          id: randomUUID(),
+          rankUpdatedAt: now,
+        })
+      }
+      created.push(member.pseudo)
     }
   })
-  return true
+  return created
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const { config } = await import("../config")
-  const created = seedDemo(openDatabase(config.databasePath))
+  const created = seedMembers(openDatabase(config.databasePath))
   console.log(
-    created
-      ? `Membre de démo créé : ${DEMO_PSEUDO}`
-      : "Le membre de démo existe déjà.",
+    created.length
+      ? `Membres ajoutés : ${created.join(", ")}`
+      : "Tous les membres existent déjà.",
   )
 }

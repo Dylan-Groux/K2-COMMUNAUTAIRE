@@ -121,7 +121,9 @@ export const todayIndex = (date = new Date()) => (date.getDay() + 6) % 7
  * Stats : endpoint du bot → { window_hours, role, games: [{ name, hours, players }] }.
  * Vides = données d'exemple.
  */
-export const DISCORD_GUILD_ID = import.meta.env.VITE_DISCORD_GUILD_ID || ""
+/** Serveur Discord QLS (« Qui se Lave ICI ???? »). Public : c'est l'ID que donne n'importe quelle invitation. */
+export const DISCORD_GUILD_ID =
+  import.meta.env.VITE_DISCORD_GUILD_ID || "1008446090506403951"
 /** Le bot QLS (VITE_WIDGET_URL) prime sur le widget public : vrais pseudos, toutes les photos. */
 export const WIDGET_URL =
   import.meta.env.VITE_WIDGET_URL ||

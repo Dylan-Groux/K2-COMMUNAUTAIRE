@@ -71,7 +71,7 @@ export default function HomePage() {
       <DiscordWidget widget={widget} isDemo={isDemo} updatedAt={updatedAt} />
       <HypePanel stats={hype.stats} ranked={hype.ranked} isDemo={hype.isDemo} />
       <GamePanels live={countByGame(widget.members)} />
-      <JoinSection inviteUrl={widget.instant_invite ?? DISCORD_URL} />
+      <JoinSection inviteUrl={DISCORD_URL} />
 
       <div className="hint">Fais défiler</div>
       <div className="scroll-space" />
