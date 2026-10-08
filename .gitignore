@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+*.db
+*.db-journal
+.env
+.env.local
+apps/api/data/
