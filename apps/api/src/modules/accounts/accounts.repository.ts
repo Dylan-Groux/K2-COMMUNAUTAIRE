@@ -61,10 +61,6 @@ export function createAccountsRepository(db: Database) {
       return Object.fromEntries(rows.map((row) => [row.slug, row.count])) as Record<string, number>
     },
 
-    deleteByUser(userId: string) {
-      db.prepare("DELETE FROM game_accounts WHERE user_id = ?").run(userId)
-    },
-
     insert(userId: string, account: NewAccountRow) {
       db.prepare(
         `INSERT INTO game_accounts (id, user_id, slug, identifier, url, friend_code, is_main,

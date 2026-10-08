@@ -6,7 +6,9 @@ export function Shell({ children }: { children: ReactNode }) {
     <main className="min-h-screen bg-[#060608] text-white">
       <Header />
       <div className="grain-overlay" />
-      <div className="mx-auto max-w-7xl px-5 pb-24 pt-36 md:px-10">{children}</div>
+      <div className="mx-auto max-w-7xl px-5 pb-24 pt-36 md:px-10">
+        {children}
+      </div>
     </main>
   )
 }

@@ -3,7 +3,9 @@ import { createBrowserRouter, RouterProvider } from "react-router"
 import { routes } from "./routes"
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 30 * 1000, refetchOnWindowFocus: false } },
+  defaultOptions: {
+    queries: { staleTime: 30 * 1000, refetchOnWindowFocus: false },
+  },
 })
 
 const router = createBrowserRouter(routes)

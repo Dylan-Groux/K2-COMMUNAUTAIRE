@@ -17,7 +17,9 @@ export function MemberPage() {
       {isPending && <StatusMessage>Chargement…</StatusMessage>}
       {error && <StatusMessage>{errorMessage(error)}</StatusMessage>}
       {member && !member.accounts.length && (
-        <StatusMessage>Ce membre n'a encore renseigné aucun compte.</StatusMessage>
+        <StatusMessage>
+          Ce membre n'a encore renseigné aucun compte.
+        </StatusMessage>
       )}
       <div className="mt-14 grid gap-4 md:grid-cols-2">
         {member?.accounts.map((a) => (
@@ -25,18 +27,26 @@ export function MemberPage() {
             <span className="game-initial">{initials(a.game)}</span>
             <div>
               <h2 className="text-xl font-semibold">
-                {a.game} {!a.isMain && <span className="smurf-badge">SMURF</span>}
+                {a.game}{" "}
+                {!a.isMain && <span className="smurf-badge">SMURF</span>}
               </h2>
               <p className="mt-2 text-white/40">{a.identifier}</p>
               <div className="mt-4">
                 <Rank account={a} />
               </div>
               {a.friendCode && (
-                <p className="mt-2 text-sm text-[#9da4ff]">Code ami : {a.friendCode}</p>
+                <p className="mt-2 text-sm text-[#9da4ff]">
+                  Code ami : {a.friendCode}
+                </p>
               )}
             </div>
             {a.url && (
-              <a href={a.url} target="_blank" rel="noreferrer" className="small-action self-start">
+              <a
+                href={a.url}
+                target="_blank"
+                rel="noreferrer"
+                className="small-action self-start"
+              >
                 Ouvrir
               </a>
             )}

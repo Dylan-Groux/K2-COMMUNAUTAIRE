@@ -2,9 +2,9 @@ import { Link } from "react-router"
 import { STATIONS, JOIN_STATION } from "../content"
 import { scrollToStation } from "../useScrollStage"
 
-type Props = { active: number; online: number; onOpenSteam: () => void }
+type Props = { active: number; online: number }
 
-export function NavBar({ active, online, onOpenSteam }: Props) {
+export function NavBar({ active, online }: Props) {
   return (
     <nav className="nav">
       <a
@@ -38,14 +38,10 @@ export function NavBar({ active, online, onOpenSteam }: Props) {
         <Link className="ghost steam-btn" to="/lore">
           Lore
         </Link>
-        <button
-          className="ghost steam-btn"
-          type="button"
-          onClick={onOpenSteam}
-          aria-haspopup="dialog"
-        >
+        {/* Même destination que l'onglet Steam des autres pages : une seule liste de membres. */}
+        <Link className="ghost steam-btn" to="/steam">
           Steam
-        </button>
+        </Link>
         <button
           className="join nav-join"
           type="button"

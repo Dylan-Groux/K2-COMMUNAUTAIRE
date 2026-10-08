@@ -4,38 +4,33 @@ export class ApiRequestError extends Error {
   constructor(
     readonly status: number,
     message: string,
-    readonly details?: unknown,
   ) {
     super(message)
   }
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+/** L'API est publique et en lecture seule : uniquement des GET, sans cookie. */
+async function get<T>(path: string): Promise<T> {
   let response: Response
   try {
-    response = await fetch(`${BASE_URL}${path}`, {
-      method,
-      credentials: "include",
-      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    })
+    response = await fetch(`${BASE_URL}${path}`)
   } catch {
-    throw new ApiRequestError(0, "Serveur injoignable. Réessaie dans un instant.")
+    throw new ApiRequestError(
+      0,
+      "Serveur injoignable. Réessaie dans un instant.",
+    )
   }
 
-  if (response.status === 204) return undefined as T
   const data = await response.json().catch(() => ({}))
-  if (!response.ok) {
-    throw new ApiRequestError(response.status, data.error ?? "Erreur inattendue", data.details)
-  }
+  if (!response.ok)
+    throw new ApiRequestError(
+      response.status,
+      data.error ?? "Erreur inattendue",
+    )
   return data as T
 }
 
-export const api = {
-  get: <T>(path: string) => request<T>("GET", path),
-  post: <T>(path: string, body?: unknown) => request<T>("POST", path, body ?? {}),
-  put: <T>(path: string, body: unknown) => request<T>("PUT", path, body),
-}
+export const api = { get }
 
 export const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Erreur inattendue"

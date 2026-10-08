@@ -1,9 +1,3 @@
-export type User = {
-  id: string
-  email: string
-  pseudo: string
-}
-
 export type GameAccount = {
   id: string
   userId: string

@@ -5,21 +5,30 @@ import { api } from "@/lib/api-client"
 export const useDirectory = () =>
   useQuery({
     queryKey: ["games"],
-    queryFn: async () => (await api.get<{ games: DirectoryGame[] }>("/games")).games,
+    queryFn: async () =>
+      (await api.get<{ games: DirectoryGame[] }>("/games")).games,
   })
 
 export const useGameAccounts = (slug: string) =>
   useQuery({
     queryKey: ["games", slug, "accounts"],
     queryFn: async () =>
-      (await api.get<{ accounts: GameAccount[] }>(`/games/${encodeURIComponent(slug)}/accounts`))
-        .accounts,
+      (
+        await api.get<{ accounts: GameAccount[] }>(
+          `/games/${encodeURIComponent(slug)}/accounts`,
+        )
+      ).accounts,
+    enabled: !!slug,
   })
 
 export const useMember = (pseudo: string) =>
   useQuery({
     queryKey: ["members", pseudo],
     queryFn: async () =>
-      (await api.get<{ member: Member }>(`/members/${encodeURIComponent(pseudo)}`)).member,
+      (
+        await api.get<{ member: Member }>(
+          `/members/${encodeURIComponent(pseudo)}`,
+        )
+      ).member,
     retry: false,
   })

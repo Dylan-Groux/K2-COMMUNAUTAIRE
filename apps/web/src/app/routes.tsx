@@ -1,10 +1,6 @@
-import type { RouteObject } from "react-router"
+import { redirect, type RouteObject } from "react-router"
 import { RouteLoader } from "@/components/RouteLoader"
-import { AuthPage } from "@/features/auth/AuthPage"
-import { GameDetailPage } from "@/features/games/GameDetailPage"
-import { GamesPage } from "@/features/games/GamesPage"
 import { MemberPage } from "@/features/members/MemberPage"
-import { ProfilePage } from "@/features/profile/ProfilePage"
 import { SteamDirectoryPage } from "@/features/steam/SteamDirectoryPage"
 
 export const routes: RouteObject[] = [
@@ -16,12 +12,15 @@ export const routes: RouteObject[] = [
       Component: (await import("@/features/home/HomePage")).default,
     }),
   },
-  { path: "/steam", Component: SteamDirectoryPage },
-  { path: "/auth", Component: AuthPage },
-  { path: "/profil", Component: ProfilePage },
+  // Annuaire : Steam par défaut, puis un jeu par onglet (/steam/valorant…)
+  { path: "/steam/:slug?", Component: SteamDirectoryPage },
   { path: "/membre/:pseudo", Component: MemberPage },
-  { path: "/jeux", Component: GamesPage },
-  { path: "/jeux/:slug", Component: GameDetailPage },
+  // Anciennes adresses de l'onglet Jeux, fusionné dans l'annuaire Steam
+  { path: "/jeux", loader: () => redirect("/steam") },
+  {
+    path: "/jeux/:slug",
+    loader: ({ params }) => redirect(`/steam/${params.slug}`),
+  },
   // Le lore embarque pdf.js : chargé seulement quand on ouvre l'onglet.
   {
     path: "/lore",

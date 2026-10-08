@@ -55,9 +55,8 @@ export function JoinSection({ inviteUrl }: { inviteUrl: string }) {
         {toast}
       </div>
       <p className="fine">
-        <Link to="/lore">Lore</Link> · <Link to="/jeux">Annuaire des jeux</Link>{" "}
-        · <Link to="/steam">Annuaire Steam</Link> ·{" "}
-        <Link to="/auth">Connexion</Link>
+        <Link to="/lore">Lore</Link> ·{" "}
+        <Link to="/steam">Annuaire des membres</Link>
       </p>
     </section>
   )

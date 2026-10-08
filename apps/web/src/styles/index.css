@@ -41,9 +41,9 @@ button {
 /* ---------- Pages communauté ---------- */
 
 .eyebrow {
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: .24em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: #9da4ff;
 }
@@ -53,23 +53,23 @@ button {
   font-family: var(--font-display);
   font-size: clamp(3.5rem, 8vw, 8rem);
   font-weight: 700;
-  line-height: .9;
-  letter-spacing: -.065em;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
 }
 
 .directory-card,
 .member-row,
 .profile-game-row,
 .auth-card {
-  border: 1px solid rgba(255,255,255,.1);
-  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.045);
   backdrop-filter: blur(20px);
 }
 
 .rank-block {
   display: flex;
   align-items: center;
-  gap: .7rem;
+  gap: 0.7rem;
   min-width: 9rem;
 }
 
@@ -77,43 +77,55 @@ button {
   width: 2.2rem;
   height: 2.2rem;
   flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,.24);
-  border-radius: .7rem 1rem .7rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 0.7rem 1rem 0.7rem 1rem;
   background: linear-gradient(145deg, #5865f2, #22263e);
-  box-shadow: 0 0 22px rgba(88,101,242,.22);
+  box-shadow: 0 0 22px rgba(88, 101, 242, 0.22);
   transform: rotate(8deg);
 }
 
-.rank-diamond { background: linear-gradient(145deg,#9df1ff,#547ac8); }
-.rank-emerald { background: linear-gradient(145deg,#4fffb0,#087b5f); }
-.rank-platinum { background: linear-gradient(145deg,#78d8d3,#416e91); }
-.rank-ascendant { background: linear-gradient(145deg,#7affac,#326d64); }
-.rank-champion { background: linear-gradient(145deg,#bd7cff,#5b2f88); }
-.rank-or { background: linear-gradient(145deg,#ffd66b,#9a6720); }
+.rank-diamond {
+  background: linear-gradient(145deg, #9df1ff, #547ac8);
+}
+.rank-emerald {
+  background: linear-gradient(145deg, #4fffb0, #087b5f);
+}
+.rank-platinum {
+  background: linear-gradient(145deg, #78d8d3, #416e91);
+}
+.rank-ascendant {
+  background: linear-gradient(145deg, #7affac, #326d64);
+}
+.rank-champion {
+  background: linear-gradient(145deg, #bd7cff, #5b2f88);
+}
+.rank-or {
+  background: linear-gradient(145deg, #ffd66b, #9a6720);
+}
 
 .smurf-badge {
   display: inline-flex;
-  margin-left: .35rem;
-  border: 1px solid rgba(157,164,255,.25);
+  margin-left: 0.35rem;
+  border: 1px solid rgba(157, 164, 255, 0.25);
   border-radius: 999px;
-  padding: .15rem .4rem;
-  font-size: .55rem;
-  letter-spacing: .12em;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
   color: #aeb4ff;
   vertical-align: middle;
 }
 
 .rank-select {
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: .7rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.7rem;
   background: #111117;
-  padding: .7rem;
+  padding: 0.7rem;
   color: white;
 }
 
 .delete-button {
-  font-size: .7rem;
-  color: rgba(255,255,255,.35);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .bubble-field {
@@ -121,29 +133,46 @@ button {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 15% 35%, rgba(88,101,242,.18) 0 2px, transparent 3px),
-    radial-gradient(circle at 75% 20%, rgba(255,255,255,.12) 0 3px, transparent 4px),
-    radial-gradient(circle at 60% 70%, rgba(88,101,242,.16), transparent 32%);
-  background-size: 90px 110px, 150px 170px, auto;
+    radial-gradient(
+      circle at 15% 35%,
+      rgba(88, 101, 242, 0.18) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 75% 20%,
+      rgba(255, 255, 255, 0.12) 0 3px,
+      transparent 4px
+    ),
+    radial-gradient(
+      circle at 60% 70%,
+      rgba(88, 101, 242, 0.16),
+      transparent 32%
+    );
+  background-size:
+    90px 110px,
+    150px 170px,
+    auto;
   animation: bubbles-drift 18s linear infinite;
 }
 
 .reveal-simple span {
   display: inline-block;
-  animation: interface-reveal .9s cubic-bezier(.22,1,.36,1) both;
+  animation: interface-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.reveal-simple span:last-child { animation-delay: .12s; }
+.reveal-simple span:last-child {
+  animation-delay: 0.12s;
+}
 
 .steam-member-card {
   display: flex;
   min-height: 20rem;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid rgba(255,255,255,.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 2rem;
   padding: 1.5rem;
-  background: rgba(255,255,255,.045);
+  background: rgba(255, 255, 255, 0.045);
   backdrop-filter: blur(24px);
 }
 
@@ -153,7 +182,7 @@ button {
   height: 5rem;
   place-items: center;
   border-radius: 1.3rem;
-  background: linear-gradient(145deg,#5865f2,#20233c);
+  background: linear-gradient(145deg, #5865f2, #20233c);
   font-family: var(--font-display);
   font-weight: 700;
 }
@@ -178,24 +207,24 @@ button {
 
 .profile-input {
   width: 100%;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: .8rem;
-  background: rgba(0,0,0,.25);
-  padding: .9rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.8rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.9rem 1rem;
   color: white;
   outline: none;
 }
 
 .profile-input:focus {
-  border-color: rgba(88,101,242,.7);
+  border-color: rgba(88, 101, 242, 0.7);
 }
 
 .small-action {
   flex-shrink: 0;
   border-radius: 999px;
-  background: rgba(88,101,242,.18);
-  padding: .65rem 1rem;
-  font-size: .75rem;
+  background: rgba(88, 101, 242, 0.18);
+  padding: 0.65rem 1rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #b8bdff;
 }
@@ -206,9 +235,9 @@ button {
   height: 3rem;
   flex-shrink: 0;
   place-items: center;
-  border-radius: .8rem;
-  background: rgba(88,101,242,.15);
-  font-size: .7rem;
+  border-radius: 0.8rem;
+  background: rgba(88, 101, 242, 0.15);
+  font-size: 0.7rem;
   font-weight: 700;
   color: #aeb4ff;
 }
@@ -221,7 +250,12 @@ button {
 }
 
 @keyframes bubbles-drift {
-  to { background-position: 0 -110px, 0 -170px, 0 0; }
+  to {
+    background-position:
+      0 -110px,
+      0 -170px,
+      0 0;
+  }
 }
 
 @keyframes interface-reveal {

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest"
-import { filterSteam } from "./components/SteamDrawer"
 import { gameKeyOf, todayIndex } from "./content"
 import {
   countByGame,
@@ -8,12 +7,6 @@ import {
   voiceChannels,
 } from "./data/discord"
 import { rankGames } from "./data/hype"
-import {
-  DEMO_STEAM,
-  friendCodeFromSteamId,
-  steamIdFromUrl,
-  toSteamMember,
-} from "./data/steam"
 import { activeStation, CENTERS, sceneAlpha, WINDOWS } from "./scroll"
 
 describe("scroll", () => {
@@ -90,53 +83,5 @@ describe("jeu du moment", () => {
       { name: "Groupe", hours: 12, players: 9 },
     ])
     expect(ranked[0].name).toBe("Groupe")
-  })
-})
-
-describe("Steam", () => {
-  it("convertit un SteamID64 en code ami", () => {
-    expect(friendCodeFromSteamId("76561198144486659")).toBe("184220931")
-    expect(friendCodeFromSteamId("pas-un-id")).toBeNull()
-  })
-
-  it("lit le SteamID dans l'URL du profil", () => {
-    expect(
-      steamIdFromUrl("https://steamcommunity.com/profiles/76561198144486659/"),
-    ).toBe("76561198144486659")
-    expect(steamIdFromUrl("https://steamcommunity.com/id/redar")).toBeNull()
-  })
-
-  it("transforme un compte K2 en carte Steam", () => {
-    const member = toSteamMember({
-      id: "a1",
-      userId: "u1",
-      pseudo: "Redar",
-      game: "Steam",
-      slug: "steam",
-      identifier: "redar",
-      url: "https://steamcommunity.com/profiles/76561198144486659",
-      friendCode: null,
-      isMain: true,
-      rankTier: "",
-      rankDivision: null,
-      rankLp: null,
-      rankUpdatedAt: "",
-      rankDeclared: true,
-    })
-    expect(member).toMatchObject({
-      discord: "Redar",
-      persona: "redar",
-      friendCode: "184220931",
-    })
-  })
-
-  it("filtre par pseudo et par jeu en cours", () => {
-    expect(
-      filterSteam(DEMO_STEAM, "okono", "all").map((m) => m.discord),
-    ).toEqual(["Oko"])
-    expect(filterSteam(DEMO_STEAM, "", "apex").map((m) => m.discord)).toEqual([
-      "Kaelyx",
-      "nova.wav",
-    ])
   })
 })

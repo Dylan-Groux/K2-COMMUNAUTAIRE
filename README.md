@@ -1,6 +1,6 @@
 # K2 Communautaire
 
-Site de la communauté Discord K2 : annuaire des jeux, rangs des membres, profils publics et annuaire Steam.
+Site de la communauté Discord QLS : accueil immersif, lore en manga, et annuaire des membres (onglet Steam, un sous-onglet par jeu avec les rangs).
 Le design vient du projet Figma Make « Site web pour Discord K2 ».
 
 ## Démarrage
@@ -9,7 +9,7 @@ Il faut Node 24 ou plus (l'API utilise le module SQLite intégré `node:sqlite`)
 
 ```bash
 npm install
-npm run seed   # crée le membre de démo : redar@k2.gg / k2-demo-2026
+npm run seed   # crée le membre de démo RedarDG et ses comptes de jeu
 npm run dev    # API sur :3001, site sur http://localhost:5173
 ```
 
@@ -25,39 +25,37 @@ npm run dev    # API sur :3001, site sur http://localhost:5173
 Monorepo npm workspaces. Le front et l'API sont séparés et ne partagent que `@k2/shared`.
 
 ```
-packages/shared      types, schémas Zod, catalogue des jeux, logique des rangs
-apps/api             API REST Express + SQLite
+packages/shared      types, catalogue des jeux, logique des rangs
+apps/api             API REST Express + SQLite, publique et en lecture seule
   src/app.ts           assemble l'app à partir de ses dépendances (createApp)
   src/db/              connexion, schéma, seed
-  src/lib/             HttpError, validate (Zod -> 400)
-  src/middlewares/     session (cookie JWT), gestion des erreurs
+  src/lib/             HttpError
+  src/middlewares/     gestion des erreurs
   src/modules/<x>/     repository (SQL) -> service (métier) -> routes (HTTP)
   test/                tests d'intégration supertest sur base en mémoire
 apps/web             front React (Vite, Tailwind, TanStack Query, React Router)
   src/app/             providers et routes
   src/components/      composants partagés (Shell, Header, Rank…)
   src/features/<x>/    une feature = ses pages, ses requêtes (queries.ts) et sa logique pure
-  src/lib/             client API, helpers (format, storage, constantes)
+  src/lib/             client API, helpers (format, constantes)
   src/test/            rendu avec routeur et mock de fetch
 ```
 
-Les schémas Zod de `@k2/shared` valident les mêmes données des deux côtés : le formulaire avant envoi, l'API à la réception.
+L'annuaire vit dans l'onglet `/steam` : Steam par défaut, puis `/steam/<jeu>` pour chaque jeu. Les anciennes adresses `/jeux/...` y redirigent.
+
+Le site n'a pas d'inscription ni de connexion : il affiche ce que contient la base. Les membres et leurs comptes de jeu y sont ajoutés par le seed, en attendant un import depuis le bot Discord.
 
 ### API
 
-| Méthode | Route                         | Accès     |
-| ------- | ----------------------------- | --------- |
-| POST    | `/api/auth/register`          | public    |
-| POST    | `/api/auth/login`             | public    |
-| POST    | `/api/auth/logout`            | public    |
-| GET     | `/api/auth/me`                | connecté  |
-| GET     | `/api/me/accounts`            | connecté  |
-| PUT     | `/api/me/accounts`            | connecté  |
-| GET     | `/api/games`                  | public    |
-| GET     | `/api/games/:slug/accounts`   | public    |
-| GET     | `/api/members/:pseudo`        | public    |
+Toutes les routes sont publiques et en lecture seule.
 
-La session est un JWT dans un cookie `httpOnly`. En développement, Vite redirige `/api` vers `localhost:3001`, donc le front et l'API ont la même origine.
+| Méthode | Route                         | Rôle                                  |
+| ------- | ----------------------------- | ------------------------------------- |
+| GET     | `/api/games`                  | jeux et nombre de membres par jeu     |
+| GET     | `/api/games/:slug/accounts`   | comptes des membres pour un jeu       |
+| GET     | `/api/members/:pseudo`        | fiche publique d'un membre            |
+
+En développement, Vite redirige `/api` vers `localhost:3001`, donc le front et l'API ont la même origine.
 
 ### Lore (manga)
 
@@ -76,9 +74,9 @@ Ce qu'on peut récupérer des APIs de jeux (rangs, elo) et de Discord (activité
 ### Configuration
 
 Copier `apps/api/.env.example` vers `apps/api/.env` et `apps/web/.env.example` vers `apps/web/.env`.
-En production, `JWT_SECRET` est obligatoire. Renseigner aussi `VITE_DISCORD_URL` avec le vrai lien d'invitation.
+En production, renseigner `VITE_DISCORD_URL` avec le vrai lien d'invitation.
 
 L'accueil (`src/features/home`) est une scène Three.js pilotée par le scroll. Sans configuration il affiche des données d'exemple (badge « Exemple ») :
-`VITE_DISCORD_GUILD_ID` branche le widget Discord du serveur (à activer dans Paramètres du serveur → Widget), `VITE_STATS_URL` branche le classement « jeu du moment » du bot. Le tiroir Steam lit les comptes Steam déclarés sur K2.
+`VITE_DISCORD_GUILD_ID` branche le widget Discord du serveur (à activer dans Paramètres du serveur → Widget), `VITE_STATS_URL` branche le classement « jeu du moment » du bot. Le bouton Steam de l'accueil mène à l'annuaire `/steam`, comme l'en-tête des autres pages.
 
 Idée futur : lore du serveur automatique, IA capable de faire suivre une histoire fantaisique comme un manga, a partir de prompt décivrant nos games de la journée de la semaine 

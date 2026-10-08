@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { mockApi, renderRoute } from "@/test/render"
+import { renderRoute } from "@/test/render"
 import { CHAPTERS, findChapter, isPublished } from "./chapters"
 
 // jsdom ne sait pas dessiner un PDF : le PDF « charge » sans jamais répondre, les pages restent en attente.
@@ -25,9 +25,6 @@ describe("chapitres", () => {
 
 describe("pages du lore", () => {
   beforeEach(() => {
-    mockApi({
-      "GET /auth/me": () => ({ status: 401, body: { error: "Non connecté" } }),
-    })
     vi.stubGlobal(
       "IntersectionObserver",
       class {

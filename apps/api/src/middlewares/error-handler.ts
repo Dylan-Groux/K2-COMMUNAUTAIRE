@@ -7,11 +7,7 @@ export function notFoundHandler(_req: Request, res: Response) {
 
 export function errorHandler(error: unknown, _req: Request, res: Response, _next: NextFunction) {
   if (error instanceof HttpError) {
-    res.status(error.status).json({ error: error.message, details: error.details })
-    return
-  }
-  if (error instanceof SyntaxError && "body" in error) {
-    res.status(400).json({ error: "JSON invalide" })
+    res.status(error.status).json({ error: error.message })
     return
   }
   console.error(error)

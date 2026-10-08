@@ -1,17 +1,18 @@
 import { randomUUID } from "node:crypto"
 import { pathToFileURL } from "node:url"
-import bcrypt from "bcryptjs"
-import { createAccountsRepository, type NewAccountRow } from "../modules/accounts/accounts.repository"
+import {
+  createAccountsRepository,
+  type NewAccountRow,
+} from "../modules/accounts/accounts.repository"
 import { createUsersRepository } from "../modules/users/users.repository"
 import { openDatabase, transaction, type Database } from "./database"
 
-export const DEMO_USER = {
-  email: "redar@k2.gg",
-  pseudo: "RedarDG",
-  password: "k2-demo-2026",
-}
+export const DEMO_PSEUDO = "RedarDG"
 
-type DemoAccount = Omit<NewAccountRow, "id" | "rankUpdatedAt" | "url" | "friendCode" | "rankDivision" | "rankLp"> &
+type DemoAccount = Omit<
+  NewAccountRow,
+  "id" | "rankUpdatedAt" | "url" | "friendCode" | "rankDivision" | "rankLp"
+> &
   Partial<Pick<NewAccountRow, "url" | "friendCode" | "rankDivision" | "rankLp">>
 
 const demoAccounts: DemoAccount[] = [
@@ -83,16 +84,15 @@ const demoAccounts: DemoAccount[] = [
 ]
 
 /** Crée le membre de démo et ses comptes s'il n'existe pas encore. */
-export async function seedDemo(db: Database) {
+export function seedDemo(db: Database) {
   const users = createUsersRepository(db)
-  if (users.findByEmail(DEMO_USER.email)) return false
+  if (users.findByPseudo(DEMO_PSEUDO)) return false
 
-  const passwordHash = await bcrypt.hash(DEMO_USER.password, 10)
   const accounts = createAccountsRepository(db)
   const now = new Date().toISOString()
 
   transaction(db, () => {
-    const user = users.create({ ...DEMO_USER, passwordHash })
+    const user = users.create(DEMO_PSEUDO)
     for (const account of demoAccounts) {
       accounts.insert(user.id, {
         url: null,
@@ -110,10 +110,10 @@ export async function seedDemo(db: Database) {
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const { config } = await import("../config")
-  const created = await seedDemo(openDatabase(config.databasePath))
+  const created = seedDemo(openDatabase(config.databasePath))
   console.log(
     created
-      ? `Membre de démo créé : ${DEMO_USER.email} / ${DEMO_USER.password}`
+      ? `Membre de démo créé : ${DEMO_PSEUDO}`
       : "Le membre de démo existe déjà.",
   )
 }
