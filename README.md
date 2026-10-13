@@ -129,10 +129,17 @@ Le dossier `~/k2-communautaire` reste en place : l'application Node de cPanel et
 2. **Reprendre la configuration et la base** : `cp ~/k2-communautaire/apps/api/.env shared/.env && cp ~/k2-communautaire/apps/api/data/* shared/data/`
 3. **Indiquer le dossier du site**, celui qu'Apache sert pour le domaine (cPanel → Domaines, colonne « Racine du document ») :
    ```bash
-   echo 'WEB_ROOT=/home/IDENTIFIANT/public_html' > shared/deploy.conf
+   echo 'WEB_ROOT=/home/IDENTIFIANT/DOSSIER_DU_SITE' > shared/deploy.conf
    ```
-   Le script y applique `rsync --delete` : vérifie bien le chemin.
-4. **Premier déploiement** : `bash <(git --git-dir=repo.git show deploy:scripts/deploy.sh)`, puis lis `shared/logs/deploy.log`. À ce stade le front est à jour, mais l'API tourne encore depuis `~/k2-communautaire`.
+   Le script y applique `rsync --delete` : vérifie bien le chemin. Ne mets `public_html` que si aucun autre site du compte n'y vit dans un sous-dossier, sinon il serait effacé.
+4. **Premier déploiement** : `current` n'existe pas encore, on sort donc le script du dépôt dans un fichier.
+   ```bash
+   git --git-dir=repo.git show deploy:scripts/deploy.sh > deploy-first.sh
+   bash deploy-first.sh
+   cat shared/logs/deploy.log
+   rm deploy-first.sh
+   ```
+   À ce stade le front est à jour, mais l'API tourne encore depuis `~/k2-communautaire`.
 5. **Brancher l'API sur la version en ligne** : Passenger garde `apps/api/passenger.cjs` comme fichier de démarrage, on le remplace par un relais vers `current`.
    ```bash
    cp current/scripts/passenger-current.cjs ~/k2-communautaire/apps/api/passenger.cjs

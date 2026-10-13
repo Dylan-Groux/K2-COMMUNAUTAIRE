@@ -40,7 +40,8 @@ WEB_ROOT="${WEB_ROOT:-}"
 current_sha() { basename "$(readlink "$BASE/current" 2>/dev/null)" 2>/dev/null; }
 
 # Bascule atomique : le lien est créé à côté puis renommé, « current » n'est jamais absent ni à moitié écrit.
-activate() {
+# (Pas « activate » : le script activate de CloudLinux, sourcé plus bas, écraserait la fonction.)
+link_current() {
   ln -s "$BASE/releases/$1" "$BASE/current.tmp" && mv -T "$BASE/current.tmp" "$BASE/current"
 }
 
@@ -66,7 +67,7 @@ healthy() {
 }
 
 switch_to() {
-  activate "$1" || return 1
+  link_current "$1" || return 1
   sync_web "$1" >> "$SHARED/logs/deploy.log" 2>&1 || return 1
   mkdir -p "$APP_ROOT/tmp" && touch "$APP_ROOT/tmp/restart.txt"
   healthy "$1"
