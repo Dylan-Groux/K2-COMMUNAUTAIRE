@@ -1,13 +1,8 @@
 import * as THREE from "three"
-import { gameKeyOf, TRACKED_GAMES } from "../content"
+import { gameColorOf } from "../content"
 import type { GameStat } from "../data/hype"
 import { localProgress, sceneAlpha, smoothstep } from "../scroll"
 import { COL, stationY, type Frame, type Kit } from "./kit"
-
-const hexOf = (name: string) => {
-  const key = gameKeyOf(name)
-  return key ? TRACKED_GAMES[key].hex : 0x8a93b8
-}
 
 /** Station 1 : jeu du moment, une colonne par jeu qui monte avec le scroll. */
 export function createHype(scene: THREE.Scene, kit: Kit) {
@@ -58,7 +53,7 @@ export function createHype(scene: THREE.Scene, kit: Kit) {
       const slots = [0, -1, 1, -2, 2] // le n°1 au centre, les suivants alternent
       list.forEach((game, i) => {
         const g = new THREE.Group()
-        const color = hexOf(game.name)
+        const color = gameColorOf(game.name).hex
         const box = new THREE.BoxGeometry(0.62, 1, 0.62)
         const m = new THREE.Mesh(
           box,

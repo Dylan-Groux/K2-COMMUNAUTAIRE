@@ -1,4 +1,5 @@
 /** Contenu de l'accueil immersif : une « station » 3D par section, sur un axe vertical. */
+import { hueOf } from "./components/Avatar"
 
 export type GameKey = "apex" | "rocket" | "aniimo" | "league"
 
@@ -38,6 +39,20 @@ export const GAME_KEYS = Object.keys(TRACKED_GAMES) as GameKey[]
 export function gameKeyOf(name: string | null | undefined): GameKey | null {
   if (!name) return null
   return GAME_KEYS.find((key) => TRACKED_GAMES[key].match.test(name)) ?? null
+}
+
+/**
+ * Couleur d'un jeu : celle du jeu suivi, sinon une teinte stable dérivée de son nom.
+ * `color` pour le CSS, `hex` pour Three.js (qui ne lit pas les variables CSS).
+ */
+export function gameColorOf(name: string): {
+  color: string
+  hex: number | string
+} {
+  const key = gameKeyOf(name)
+  if (key) return TRACKED_GAMES[key]
+  const color = `hsl(${hueOf(name.toLowerCase())}, 70%, 68%)`
+  return { color, hex: color }
 }
 
 /** Sections dans l'ordre du scroll. `words` = mots géants derrière la scène. */

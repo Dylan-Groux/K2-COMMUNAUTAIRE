@@ -1,4 +1,9 @@
-import { GAME_PANELS, gameKeyOf, JOIN_STATION, TRACKED_GAMES } from "../content"
+import {
+  GAME_PANELS,
+  gameColorOf,
+  JOIN_STATION,
+  TRACKED_GAMES,
+} from "../content"
 import { formatHours, type GameStat, type HypeStats } from "../data/hype"
 import { scrollToStation } from "../useScrollStage"
 import { cssVars } from "./Avatar"
@@ -32,11 +37,6 @@ export function HeroPanel() {
   )
 }
 
-const colorOf = (name: string) => {
-  const key = gameKeyOf(name)
-  return key ? TRACKED_GAMES[key].color : "var(--muted)"
-}
-
 type HypeProps = { stats: HypeStats; ranked: GameStat[]; isDemo: boolean }
 
 export function HypePanel({ stats, ranked, isDemo }: HypeProps) {
@@ -60,7 +60,10 @@ export function HypePanel({ stats, ranked, isDemo }: HypeProps) {
       )}
       <ol className="rank">
         {ranked.slice(0, 6).map((game) => (
-          <li key={game.name} style={cssVars({ "--g": colorOf(game.name) })}>
+          <li
+            key={game.name}
+            style={cssVars({ "--g": gameColorOf(game.name).color })}
+          >
             <b>{game.name}</b>
             <span>
               {formatHours(game.hours)} · {game.players} j.

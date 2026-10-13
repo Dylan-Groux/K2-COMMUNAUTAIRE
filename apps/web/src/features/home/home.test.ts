@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { gameKeyOf, todayIndex } from "./content"
+import { gameColorOf, gameKeyOf, todayIndex } from "./content"
 import {
   countByGame,
   DEMO_WIDGET,
@@ -28,6 +28,15 @@ describe("jeux suivis", () => {
     expect(gameKeyOf("Apex Legends")).toBe("apex")
     expect(gameKeyOf("League of Legends")).toBe("league")
     expect(gameKeyOf("Spotify")).toBeNull()
+  })
+
+  it("donne une couleur à tous les jeux, stable pour un jeu non suivi", () => {
+    expect(gameColorOf("Apex Legends").hex).toBe(0xff4d3a)
+    expect(gameColorOf("Valorant").color).toMatch(/^hsl\(\d+, 70%, 68%\)$/)
+    expect(gameColorOf("VALORANT")).toEqual(gameColorOf("Valorant"))
+    expect(gameColorOf("Fortnite").color).not.toBe(
+      gameColorOf("Valorant").color,
+    )
   })
 
   it("lundi = 0, dimanche = 6", () => {
