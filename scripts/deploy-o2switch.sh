@@ -14,9 +14,12 @@ if ! grep -Eq '^VITE_API_URL=.+' apps/web/.env.production; then
 fi
 
 # shellcheck source=/dev/null
+set +u  # activate (CloudLinux) lit CL_VIRTUAL_ENV sans valeur par défaut
 source "$NODEVENV"
+set -u
 
-npm ci
+# o2switch configure npm avec omit=dev : sans --include=dev, ni vite ni vitest ne sont installés.
+npm ci --include=dev
 npm test
 npm run build
 # Ajoute à la base de l'API les membres absents du seed, sans toucher aux existants.
