@@ -96,16 +96,60 @@ api.<domaine>           l'API, application Node gérée par Passenger
 5. Côté bot : `EXPORT_DIR=/home/IDENTIFIANT/public_html/bot` (voir le README du bot).
 
 **Avec le bot sur le même hébergement** (dossier `~/k2-bot`, dépôt séparé)
-- Ce sont deux applications distinctes dans **Setup Node.js App**, chacune avec son environnement (`nodevenv/k2-bot/…` et `nodevenv/k2-communautaire/…`). Le `NODEVENV` à passer au script est celui du site, pas celui du bot.
+- Ce sont deux applications distinctes dans **Setup Node.js App**, chacune avec son environnement (`nodevenv/k2-bot/…` et `nodevenv/k2-communautaire/…`). Le script de déploiement utilise celui du site.
 - L'application « bot » de cPanel (le fichier factice `passenger-placeholder.cjs`) doit avoir sa **propre URL**, par exemple `bot-app.<domaine>`, jamais la racine du domaine du site : Passenger intercepterait alors toutes les pages.
 - Le bot écrit dans `~/public_html/bot` avec le même utilisateur Linux : aucun droit à régler. Comme ces fichiers sont servis par le même domaine que le site, il n'y a pas de CORS non plus.
 - Le script de déploiement ne supprime jamais `public_html/bot`, et le `.htaccess` du site ne réécrit pas ce dossier.
 
-**À chaque mise à jour**
-```bash
-cd ~/k2-communautaire && git pull
-NODEVENV=/home/IDENTIFIANT/nodevenv/k2-communautaire/24/bin/activate bash scripts/deploy-o2switch.sh
+### Déploiement automatique (CI/CD)
+
+Un push sur `master` suffit. GitHub Actions lance le typecheck, les tests et le build ([.github/workflows/ci.yml](.github/workflows/ci.yml)), puis publie la branche `deploy` : le commit testé, plus le front construit (`apps/web/dist`). Sur o2switch, une tâche cron lance [scripts/deploy.sh](scripts/deploy.sh) toutes les 2 minutes : c'est **le serveur qui vient chercher** la branche `deploy`, GitHub ne se connecte jamais au serveur.
+
 ```
-Le script installe les dépendances, lance les tests, construit le front et le copie dans `public_html`, sans toucher à `bot/` ni à `.well-known/`. Il redémarre ensuite l'API. Le `.htaccess` du front renvoie `index.html` pour les routes du site et laisse passer `/bot/`. Tant que le bot n'écrit rien, l'accueil reste en mode « Exemple ».
+~/k2-communautaire-prod/
+  repo.git/        clone nu, sert uniquement à récupérer le code
+  releases/<sha>/  une version complète (code, front construit, node_modules de l'API), les 3 dernières sont gardées
+  current          lien vers la version en ligne
+  shared/          .env et data/k2.db de l'API, logs/, deploy.conf : ne bougent pas d'une version à l'autre
+```
+
+À chaque nouvelle version, le script l'installe à côté, complète la base avec le seed, bascule `current`, copie le front dans le dossier du site (sans toucher à `bot/` ni à `.well-known/`), redémarre l'API et vérifie qu'elle répond sur `<VITE_API_URL>/health`. Sinon il remet la version précédente. Une version qui a échoué n'est pas retentée (`shared/failed-sha`) : pousse un correctif, ou supprime ce fichier pour réessayer.
+
+**Mise en place (une seule fois, en SSH)**
+
+Le dossier `~/k2-communautaire` reste en place : l'application Node de cPanel et son environnement en dépendent.
+
+1. **Préparer le dossier** (le dépôt est public, aucun identifiant n'est nécessaire) :
+   ```bash
+   mkdir -p ~/k2-communautaire-prod/shared/data ~/k2-communautaire-prod/shared/logs && cd ~/k2-communautaire-prod
+   git init --bare repo.git
+   git --git-dir=repo.git remote add origin https://github.com/Dylan-Groux/K2-COMMUNAUTAIRE.git
+   git --git-dir=repo.git fetch origin '+refs/heads/deploy:refs/heads/deploy'
+   ```
+2. **Reprendre la configuration et la base** : `cp ~/k2-communautaire/apps/api/.env shared/.env && cp ~/k2-communautaire/apps/api/data/* shared/data/`
+3. **Indiquer le dossier du site**, celui qu'Apache sert pour le domaine (cPanel → Domaines, colonne « Racine du document ») :
+   ```bash
+   echo 'WEB_ROOT=/home/IDENTIFIANT/public_html' > shared/deploy.conf
+   ```
+   Le script y applique `rsync --delete` : vérifie bien le chemin.
+4. **Premier déploiement** : `bash <(git --git-dir=repo.git show deploy:scripts/deploy.sh)`, puis lis `shared/logs/deploy.log`. À ce stade le front est à jour, mais l'API tourne encore depuis `~/k2-communautaire`.
+5. **Brancher l'API sur la version en ligne** : Passenger garde `apps/api/passenger.cjs` comme fichier de démarrage, on le remplace par un relais vers `current`.
+   ```bash
+   cp current/scripts/passenger-current.cjs ~/k2-communautaire/apps/api/passenger.cjs
+   touch ~/k2-communautaire/tmp/restart.txt
+   ```
+   Vérifie ensuite `https://api.<domaine>/api/health`.
+6. **Créer la tâche cron** :
+   ```
+   */2 * * * * bash /home/IDENTIFIANT/k2-communautaire-prod/current/scripts/deploy.sh >/dev/null 2>&1
+   ```
+
+**Au quotidien**
+
+- Suivre un déploiement : `tail -f ~/k2-communautaire-prod/shared/logs/deploy.log`
+- Revenir à la version précédente : `bash ~/k2-communautaire-prod/current/scripts/deploy.sh rollback`
+- Ne fais plus de `git pull` dans `~/k2-communautaire` : il écraserait le relais de l'étape 5.
+
+Le `.htaccess` du front renvoie `index.html` pour les routes du site et laisse passer `/bot/`. Tant que le bot n'écrit rien, l'accueil reste en mode « Exemple ».
 
 Idée futur : lore du serveur automatique, IA capable de faire suivre une histoire fantaisique comme un manga, a partir de prompt décivrant nos games de la journée de la semaine 
