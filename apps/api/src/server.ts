@@ -6,5 +6,5 @@ const db = openDatabase(config.databasePath)
 const app = createApp({ db, webOrigin: config.webOrigin })
 
 app.listen(config.port, () => {
-  console.log(`API QLS prête sur http://localhost:${config.port}`)
+  console.log(`API QSL prête sur http://localhost:${config.port}`)
 })

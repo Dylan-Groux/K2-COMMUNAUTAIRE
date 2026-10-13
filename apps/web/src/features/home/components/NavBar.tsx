@@ -15,7 +15,7 @@ export function NavBar({ active, online }: Props) {
           scrollToStation(0)
         }}
       >
-        QLS<small>QG GAMING · FR</small>
+        QSL<small>QG GAMING · FR</small>
       </a>
       <ol className="steps" aria-label="Sections">
         {STATIONS.map((station, i) => (

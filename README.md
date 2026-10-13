@@ -1,6 +1,6 @@
 # K2 Communautaire
 
-Site de la communauté Discord QLS : accueil immersif, lore en manga, et annuaire des membres (onglet Steam, un sous-onglet par jeu avec les liens et codes amis).
+Site de la communauté Discord QSL : accueil immersif, lore en manga, et annuaire des membres (onglet Steam, un sous-onglet par jeu avec les liens et codes amis).
 Le design vient du projet Figma Make « Site web pour Discord K2 ».
 
 ## Démarrage
@@ -77,14 +77,14 @@ Copier `apps/api/.env.example` vers `apps/api/.env` et `apps/web/.env.example` v
 Les valeurs de production du front sont dans `apps/web/.env.production` (publiques, versionnées).
 
 L'accueil (`src/features/home`) est une scène Three.js pilotée par le scroll. Sans données il affiche un exemple (badge « Exemple »).
-`VITE_WIDGET_URL` branche le widget du header, les salons vocaux et les avatars ; `VITE_STATS_URL` branche le classement « jeu du moment ». En production, les deux pointent vers les fichiers du bot QLS (`/bot/widget.json`, `/bot/stats.json`), donc le widget officiel de Discord n'est pas nécessaire. Le bouton Steam de l'accueil mène à l'annuaire `/steam`, comme l'en-tête des autres pages.
+`VITE_WIDGET_URL` branche le widget du header, les salons vocaux et les avatars ; `VITE_STATS_URL` branche le classement « jeu du moment ». En production, les deux pointent vers les fichiers du bot QSL (`/bot/widget.json`, `/bot/stats.json`), donc le widget officiel de Discord n'est pas nécessaire. Le bouton Steam de l'accueil mène à l'annuaire `/steam`, comme l'en-tête des autres pages.
 
 ## Mise en production (o2switch)
 
 ```
 ~/k2-communautaire      ce dépôt (hors de public_html)
 ~/public_html           le front construit (copié par le script)
-~/public_html/bot       écrit par le bot QLS (EXPORT_DIR) : widget.json, stats.json, admin/
+~/public_html/bot       écrit par le bot QSL (EXPORT_DIR) : widget.json, stats.json, admin/
 api.<domaine>           l'API, application Node gérée par Passenger
 ```
 

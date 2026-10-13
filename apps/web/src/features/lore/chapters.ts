@@ -1,4 +1,4 @@
-/** Les chapitres du manga de QLS. Ajouter un chapitre : déposer le PDF dans public/lore/ et ajouter une entrée ici. */
+/** Les chapitres du manga de QSL. Ajouter un chapitre : déposer le PDF dans public/lore/ et ajouter une entrée ici. */
 
 export type Chapter = {
   number: number

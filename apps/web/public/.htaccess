@@ -2,7 +2,7 @@
 
 RewriteEngine On
 
-# bot/ est écrit par le bot QLS (EXPORT_DIR) : jamais redirigé vers le site.
+# bot/ est écrit par le bot QSL (EXPORT_DIR) : jamais redirigé vers le site.
 # Tant que le bot n'y écrit rien, /bot/widget.json répond 404 et l'accueil reste sur les données d'exemple.
 RewriteRule ^bot/ - [L]
 

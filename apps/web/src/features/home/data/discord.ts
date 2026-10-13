@@ -26,7 +26,7 @@ const demoAvatar = (i: number) =>
   `https://cdn.discordapp.com/embed/avatars/${i % 6}.png`
 
 export const DEMO_WIDGET: Widget = {
-  name: "QLS",
+  name: "QSL",
   instant_invite: null,
   presence_count: 23,
   channels: [

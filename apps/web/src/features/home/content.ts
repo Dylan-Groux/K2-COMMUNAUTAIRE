@@ -42,7 +42,7 @@ export function gameKeyOf(name: string | null | undefined): GameKey | null {
 
 /** Sections dans l'ordre du scroll. `words` = mots géants derrière la scène. */
 export const STATIONS = [
-  { nav: "Accueil", accent: "var(--cyan)", words: ["QLS", "le QG"] },
+  { nav: "Accueil", accent: "var(--cyan)", words: ["QSL", "le QG"] },
   { nav: "Top 48 h", accent: "var(--signal)", words: ["Hype", "48 h"] },
   { nav: "Apex", accent: "var(--apex)", words: ["Drop", "Apex"] },
   { nav: "Rocket League", accent: "var(--rl)", words: ["Boost", "Rocket"] },
@@ -121,10 +121,10 @@ export const todayIndex = (date = new Date()) => (date.getDay() + 6) % 7
  * Stats : endpoint du bot → { window_hours, role, games: [{ name, hours, players }] }.
  * Vides = données d'exemple.
  */
-/** Serveur Discord QLS (« Qui se Lave ICI ???? »). Public : c'est l'ID que donne n'importe quelle invitation. */
+/** Serveur Discord QSL (« Qui se Lave ICI ???? »). Public : c'est l'ID que donne n'importe quelle invitation. */
 export const DISCORD_GUILD_ID =
   import.meta.env.VITE_DISCORD_GUILD_ID || "1008446090506403951"
-/** Le bot QLS (VITE_WIDGET_URL) prime sur le widget public : vrais pseudos, toutes les photos. */
+/** Le bot QSL (VITE_WIDGET_URL) prime sur le widget public : vrais pseudos, toutes les photos. */
 export const WIDGET_URL =
   import.meta.env.VITE_WIDGET_URL ||
   (DISCORD_GUILD_ID

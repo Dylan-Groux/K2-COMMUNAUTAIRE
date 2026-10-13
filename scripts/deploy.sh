@@ -47,7 +47,7 @@ link_current() {
 
 # Les fichiers de assets/ portent leur empreinte : on les copie d'abord, puis index.html qui les référence,
 # et seulement ensuite on supprime les anciens. Un visiteur ne tombe jamais sur une page sans ses fichiers.
-# bot/ appartient au bot QLS, .well-known/ au certificat SSL : jamais supprimés.
+# bot/ appartient au bot QSL, .well-known/ au certificat SSL : jamais supprimés.
 sync_web() {
   local dist="$BASE/releases/$1/apps/web/dist/"
   rsync -a --exclude index.html "$dist" "$WEB_ROOT"/ &&

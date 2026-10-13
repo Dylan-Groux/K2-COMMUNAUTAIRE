@@ -64,7 +64,7 @@ function ChapterCard({ chapter }: { chapter: Chapter }) {
 export default function LorePage() {
   return (
     <Shell>
-      <p className="eyebrow">Lore QLS</p>
+      <p className="eyebrow">Lore QSL</p>
       <h1 className="page-title">{SERIES}.</h1>
       <p className="mt-6 max-w-xl text-white/50">
         L'histoire du serveur, en manga. Des inconnus, quatorze jours, et

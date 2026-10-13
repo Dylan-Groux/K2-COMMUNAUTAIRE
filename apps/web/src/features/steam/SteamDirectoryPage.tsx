@@ -92,7 +92,7 @@ export function SteamDirectoryPage() {
   return (
     <Shell>
       <div className="bubble-field" />
-      <p className="eyebrow">Annuaire QLS</p>
+      <p className="eyebrow">Annuaire QSL</p>
       <h1 className="page-title reveal-simple">
         <span>Les membres.</span>
         <br />

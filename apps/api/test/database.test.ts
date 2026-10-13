@@ -7,7 +7,7 @@ import { openDatabase } from "../src/db/database"
 
 describe("migration de la base", () => {
   it("retire e-mail et mot de passe d'une ancienne base, sans perdre les membres ni leurs comptes", () => {
-    const path = join(mkdtempSync(join(tmpdir(), "qls-api-")), "old.db")
+    const path = join(mkdtempSync(join(tmpdir(), "qsl-api-")), "old.db")
     const old = new DatabaseSync(path)
     old.exec(`
       CREATE TABLE users (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, pseudo TEXT NOT NULL UNIQUE,
@@ -16,7 +16,7 @@ describe("migration de la base", () => {
         slug TEXT NOT NULL, identifier TEXT NOT NULL, url TEXT, friend_code TEXT, is_main INTEGER NOT NULL,
         rank_tier TEXT NOT NULL, rank_division TEXT, rank_lp INTEGER, rank_updated_at TEXT NOT NULL,
         rank_declared INTEGER NOT NULL DEFAULT 1);
-      INSERT INTO users VALUES ('u1', 'nox@qls.gg', 'Nox', NULL, 'hash', '2026-10-01');
+      INSERT INTO users VALUES ('u1', 'nox@qsl.gg', 'Nox', NULL, 'hash', '2026-10-01');
       INSERT INTO game_accounts (id, user_id, slug, identifier, is_main, rank_tier, rank_updated_at)
         VALUES ('a1', 'u1', 'valorant', 'Nox#EUW', 1, 'Or', '2026-10-01');
     `)
