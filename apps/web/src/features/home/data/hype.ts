@@ -22,11 +22,9 @@ export const DEMO_STATS: HypeStats = {
   ],
 }
 
-/** Heures × √joueurs : un jeu joué par beaucoup de monde passe devant un jeu farmé par une seule personne. */
-export const hypeScore = (g: GameStat) => g.hours * Math.sqrt(g.players)
-
+/** Jeu le plus joué au sens large : uniquement le temps cumulé, quel que soit le nombre de joueurs. */
 export const rankGames = (games: GameStat[]) =>
-  games.slice().sort((a, b) => hypeScore(b) - hypeScore(a))
+  games.slice().sort((a, b) => b.hours - a.hours)
 
 export const formatHours = (hours: number) =>
   `${hours.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} h`

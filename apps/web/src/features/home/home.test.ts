@@ -86,11 +86,21 @@ describe("widget Discord", () => {
 })
 
 describe("jeu du moment", () => {
-  it("préfère un jeu joué par beaucoup de monde", () => {
+  it("classe par heures cumulées, quel que soit le nombre de joueurs", () => {
     const ranked = rankGames([
-      { name: "Solo", hours: 20, players: 1 },
+      { name: "Aniimo", hours: 7.2, players: 3 },
+      { name: "Valorant", hours: 9.5, players: 1 },
       { name: "Groupe", hours: 12, players: 9 },
     ])
-    expect(ranked[0].name).toBe("Groupe")
+    expect(ranked.map((g) => g.name)).toEqual(["Groupe", "Valorant", "Aniimo"])
+  })
+
+  it("ne modifie pas la liste reçue", () => {
+    const games = [
+      { name: "A", hours: 1, players: 1 },
+      { name: "B", hours: 2, players: 1 },
+    ]
+    rankGames(games)
+    expect(games[0].name).toBe("A")
   })
 })
