@@ -14,6 +14,7 @@ export const COL = {
   summoners: 0xff6fd8,
   ffxiii: 0xdde7ff,
   fortnite: 0xffe14d,
+  rematch: 0x6c7bff,
   signal: 0xff6a3d,
 }
 

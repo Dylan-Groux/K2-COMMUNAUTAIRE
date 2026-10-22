@@ -27,6 +27,7 @@ export const STATION_MODELS: Record<GameKey, () => Promise<StationFactory>> = {
   summoners: () => import("./summoners").then((m) => m.createSummoners),
   ffxiii: () => import("./ffxiii").then((m) => m.createFfxiii),
   fortnite: () => import("./fortnite").then((m) => m.createFortnite),
+  rematch: () => import("./rematch").then((m) => m.createRematch),
 }
 
 type Connection = { saveData?: boolean; effectiveType?: string }

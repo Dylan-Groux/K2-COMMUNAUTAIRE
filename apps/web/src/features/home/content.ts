@@ -13,6 +13,7 @@ export type GameKey =
   | "summoners"
   | "ffxiii"
   | "fortnite"
+  | "rematch"
 
 type TrackedGame = {
   match: RegExp
@@ -117,6 +118,14 @@ export const TRACKED_GAMES: Record<GameKey, TrackedGame> = {
     label: "Fortnite",
     nav: "Fortnite",
     words: ["Build", "Fortnite"],
+  },
+  rematch: {
+    match: /\brematch\b/i,
+    color: "var(--rematch)",
+    hex: 0x6c7bff,
+    label: "Rematch",
+    nav: "Rematch",
+    words: ["Frappe", "Rematch"],
   },
 }
 
@@ -239,6 +248,11 @@ export const GAME_PANELS: Record<
     title: "Cent joueurs, une île et de quoi construire.",
     text: "Le battle royale d'Epic Games : on saute du bus, on construit pour se protéger et on tient jusqu'à la dernière place.",
     chips: ["Battle royale", "Construction", "Free-to-play"],
+  },
+  rematch: {
+    title: "Du foot en 5 contre 5, un joueur chacun.",
+    text: "Le jeu de foot de Sloclap : chacun contrôle un seul joueur, sans faute ni hors-jeu, sur un terrain fermé où le ballon rebondit sur les murs.",
+    chips: ["Foot", "5v5", "Multijoueur"],
   },
 }
 

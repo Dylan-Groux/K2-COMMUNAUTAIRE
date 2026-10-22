@@ -149,6 +149,7 @@ describe("widget Discord", () => {
       summoners: 0,
       ffxiii: 0,
       fortnite: 0,
+      rematch: 0,
     })
   })
 
