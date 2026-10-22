@@ -2,11 +2,15 @@ import * as THREE from "three"
 import { fract, lerp, localProgress, sceneAlpha, smoothstep } from "../scroll"
 import { COL, stationY, type Frame, type Kit, type Station } from "./kit"
 
-/** Station 2 : terrain hexagonal, zone qui se referme et largages. */
-export function createApex(scene: THREE.Scene, kit: Kit): Station {
+/** Station Apex : terrain hexagonal, zone qui se referme et largages. */
+export function createApex(
+  parent: THREE.Object3D,
+  kit: Kit,
+  slot: number,
+): Station {
   const group = new THREE.Group()
-  group.position.y = stationY(2) - 1
-  scene.add(group)
+  group.position.y = stationY(slot) - 1
+  parent.add(group)
 
   const HR = 7
   const HS = 0.32
@@ -98,7 +102,7 @@ export function createApex(scene: THREE.Scene, kit: Kit): Station {
   const color = new THREE.Color()
   return {
     update({ v, t }: Frame) {
-      const la = localProgress(2, v)
+      const la = localProgress(slot, v)
       group.rotation.y = -0.4 + v * 1.5 + Math.sin(t * 0.2) * 0.05
       const zr = lerp(3.4, 0.9, smoothstep(0, 1, la))
       zone.scale.set(zr, 1, zr)
@@ -113,7 +117,7 @@ export function createApex(scene: THREE.Scene, kit: Kit): Station {
         hexMesh.setColorAt(i, color)
       })
       hexMesh.instanceColor!.needsUpdate = true
-      const visible = sceneAlpha(2, v) > 0.01
+      const visible = sceneAlpha(slot, v) > 0.01
       for (const d of drops) {
         const u = fract(d.ph + t * 0.18 + v * 3)
         d.g.position.set(

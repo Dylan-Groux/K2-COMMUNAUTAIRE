@@ -2,11 +2,15 @@ import * as THREE from "three"
 import { lerp, localProgress, smoothstep } from "../scroll"
 import { COL, stationY, type Frame, type Kit, type Station } from "./kit"
 
-/** Station 4 : un œuf qui s'éveille et trois créatures en orbite. */
-export function createAniimo(scene: THREE.Scene, kit: Kit): Station {
+/** Station Aniimo : un œuf qui s'éveille et trois créatures en orbite. */
+export function createAniimo(
+  parent: THREE.Object3D,
+  kit: Kit,
+  slot: number,
+): Station {
   const group = new THREE.Group()
-  group.position.y = stationY(4)
-  scene.add(group)
+  group.position.y = stationY(slot)
+  parent.add(group)
 
   const profile: THREE.Vector2[] = []
   for (let i = 0; i <= 32; i++) {
@@ -79,7 +83,7 @@ export function createAniimo(scene: THREE.Scene, kit: Kit): Station {
   const glowMaterial = eggGlow.material
   return {
     update({ v, t }: Frame) {
-      const ln = localProgress(4, v)
+      const ln = localProgress(slot, v)
       group.rotation.y = v * 1.2
       egg.rotation.z = Math.sin(t * 5) * 0.06 * smoothstep(0.3, 1, ln)
       egg.position.y = Math.sin(t * 1.2) * 0.06

@@ -7,6 +7,7 @@ import {
   localProgress,
   sceneAlpha,
   smoothstep,
+  snapTarget,
 } from "./scroll"
 
 const prefersReducedMotion = () =>
@@ -16,46 +17,85 @@ const maxScroll = () =>
   Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
 
 export function scrollToStation(i: number) {
+  const index = Math.max(0, Math.min(CENTERS.length - 1, i))
   window.scrollTo({
-    top: CENTERS[i] * maxScroll(),
+    top: CENTERS[index] * maxScroll(),
     behavior: prefersReducedMotion() ? "auto" : "smooth",
   })
 }
 
+/** Rejoindre est toujours la dernière station, quel que soit le nombre de jeux à l'affiche. */
+export const scrollToJoin = () => scrollToStation(CENTERS.length - 1)
+
+/** Délai sans scroll au-delà duquel on considère que le visiteur s'est arrêté. */
+const SNAP_DELAY = 220
+
 /**
- * La page est une scène fixe : le scroll (1050vh de vide) ne sert qu'à produire une progression [0, 1].
+ * La page est une scène fixe : le scroll (une zone vide) ne sert qu'à produire une progression [0, 1].
  * À chaque image, on lisse cette progression puis on met à jour les calques DOM ([data-s]) et la scène 3D.
+ * Arrêté entre deux stations, le scroll est aimanté vers la suivante dans le sens du mouvement.
+ * `layoutKey` change quand la liste des stations change : les calques sont alors relus.
  */
 export function useScrollStage(
   rootRef: RefObject<HTMLElement | null>,
   canvasRef: RefObject<HTMLCanvasElement | null>,
   onActiveChange: (station: number) => void,
+  layoutKey: string,
 ) {
   const sceneRef = useRef<HomeScene | null>(null)
   const onActiveRef = useRef(onActiveChange)
   onActiveRef.current = onActiveChange
+  const layoutDirty = useRef(true)
+
+  useEffect(() => {
+    layoutDirty.current = true
+  }, [layoutKey])
 
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
     const reduce = prefersReducedMotion()
 
-    const words = [...root.querySelectorAll<HTMLElement>(".word")]
-    const layers = [...root.querySelectorAll<HTMLElement>("[data-s]")].filter(
-      (el) => !el.classList.contains("word"),
-    )
+    let words: HTMLElement[] = []
+    let layers: HTMLElement[] = []
+    const readLayers = () => {
+      words = [...root.querySelectorAll<HTMLElement>(".word")]
+      layers = [...root.querySelectorAll<HTMLElement>("[data-s]")].filter(
+        (el) => !el.classList.contains("word"),
+      )
+    }
     const bar = root.querySelector<HTMLElement>(".bar")
     const hint = root.querySelector<HTMLElement>(".hint")
 
     let target = 0
+    let lastY = window.scrollY
+    let direction = 1
+    let snapTimer = 0
     const readScroll = () => {
       target = clamp(window.scrollY / maxScroll(), 0, 1)
+    }
+    const onScroll = () => {
+      readScroll()
+      if (window.scrollY !== lastY)
+        direction = Math.sign(window.scrollY - lastY)
+      lastY = window.scrollY
+      clearTimeout(snapTimer)
+      snapTimer = window.setTimeout(() => {
+        const station = snapTarget(target, direction)
+        if (station !== null) scrollToStation(station)
+      }, SNAP_DELAY)
     }
     readScroll()
     let progress = target
     let lastActive = -1
 
     function updateDom(v: number) {
+      if (layoutDirty.current) {
+        layoutDirty.current = false
+        readLayers()
+        readScroll()
+        lastActive = -1
+      }
       words.forEach((word, i) => {
         const a = sceneAlpha(i, v)
         const drift = (localProgress(i, v) - 0.5) * 5
@@ -102,7 +142,7 @@ export function useScrollStage(
       readScroll()
       sceneRef.current?.resize()
     }
-    window.addEventListener("scroll", readScroll, { passive: true })
+    window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("resize", onResize)
     window.addEventListener("pointermove", onPointer, { passive: true })
 
@@ -125,7 +165,8 @@ export function useScrollStage(
 
     return () => {
       cancelAnimationFrame(raf)
-      window.removeEventListener("scroll", readScroll)
+      clearTimeout(snapTimer)
+      window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onResize)
       window.removeEventListener("pointermove", onPointer)
       sceneRef.current?.dispose()

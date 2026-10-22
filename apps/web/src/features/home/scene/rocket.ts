@@ -26,18 +26,19 @@ const bezier3 = (
 }
 
 /**
- * Station 3 : plan « héros » piloté par la progression locale u ∈ [0, 1].
+ * Station Rocket League : plan « héros » piloté par la progression locale u ∈ [0, 1].
  * La voiture surgit en bas à droite, file vers le ballon, prend son flip reset (0.62 → 0.72),
  * se replace, front flip, frappe (0.84) et but avec explosion (0.92 → 1).
  */
 export function createRocket(
-  scene: THREE.Scene,
+  parent: THREE.Object3D,
   kit: Kit,
+  slot: number,
   callouts: Callouts,
 ): Station {
   const group = new THREE.Group()
-  group.position.y = stationY(3)
-  scene.add(group)
+  group.position.y = stationY(slot)
+  parent.add(group)
 
   const grid = new THREE.GridHelper(10, 20, COL.rl, 0x1b2a55)
   grid.position.y = -0.8
@@ -473,8 +474,8 @@ export function createRocket(
 
   return {
     update({ v, t, ly, mobile, camera }: Frame) {
-      const lr = localProgress(3, v)
-      const ra = sceneAlpha(3, v)
+      const lr = localProgress(slot, v)
+      const ra = sceneAlpha(slot, v)
       mx = mobile ? 0.42 : 1
 
       const bp = ballAt(lr, t)

@@ -1,30 +1,46 @@
 import * as THREE from "three"
-import { JOIN_STATION } from "../content"
+import { TRACKED_GAMES, type GameKey } from "../content"
 import { lerp, smoothstep, WINDOWS } from "../scroll"
-import { createAniimo } from "./aniimo"
-import { createApex } from "./apex"
 import { createCores } from "./core"
+import { createGeneric } from "./generic"
 import { createHype } from "./hype"
-import { COL, createKit, disposeScene, stationY, type Frame } from "./kit"
-import { createLol } from "./lol"
-import { createRocket, type Callouts } from "./rocket"
+import { createIdle } from "./idle"
+import {
+  COL,
+  createKit,
+  disposeScene,
+  stationY,
+  type Frame,
+  type Station,
+} from "./kit"
+import { STATION_MODELS, type StationFactory } from "./registry"
+import type { Callouts } from "./rocket"
+
+/** Station entre le Top 48 h et Rejoindre : un jeu modélisé, un jeu sans modèle, ou la veille. */
+export type SceneEntry =
+  | { kind: "model"; key: GameKey }
+  | { kind: "generic"; name: string; color: THREE.ColorRepresentation }
+  | { kind: "idle" }
+
+/** Première place des stations de jeu (après l'accueil et le Top 48 h). */
+const FIRST_GAME_SLOT = 2
 
 /** Hauteur visée par la caméra : posée sur chaque station pendant sa fenêtre, interpolée entre deux. */
-const CAMERA_KEYS = WINDOWS.flatMap(([a, b], i) => {
-  const offset = i === JOIN_STATION ? -1.3 : 0
-  return [
-    [a, stationY(i) + 0.2 + offset],
-    [b, stationY(i) - 0.15 + offset],
-  ]
-})
-
 export function cameraTargetY(v: number) {
-  for (let i = 0; i < CAMERA_KEYS.length - 1; i++) {
-    const [a, y0] = CAMERA_KEYS[i]
-    const [b, y1] = CAMERA_KEYS[i + 1]
+  const join = WINDOWS.length - 1
+  const keys = WINDOWS.flatMap(([a, b], i) => {
+    const offset = i === join ? -1.3 : 0
+    return [
+      [a, stationY(i) + 0.2 + offset],
+      [b, stationY(i) - 0.15 + offset],
+    ]
+  })
+  for (let i = 0; i < keys.length - 1; i++) {
+    const [a, y0] = keys[i]
+    const [b, y1] = keys[i + 1]
     if (v <= b) return lerp(y0, y1, smoothstep(a, b, v))
   }
-  return CAMERA_KEYS[CAMERA_KEYS.length - 1][1]
+  return keys[keys.length - 1][1]
 }
 
 /** Crée la scène 3D. Lève une erreur si WebGL est indisponible. */
@@ -50,14 +66,66 @@ export function createScene(canvas: HTMLCanvasElement, callouts: Callouts) {
   const kit = createKit()
   const cores = createCores(scene, kit)
   const hype = createHype(scene, kit)
-  const stations = [
-    cores,
-    hype,
-    createApex(scene, kit),
-    createRocket(scene, kit, callouts),
-    createAniimo(scene, kit),
-    createLol(scene, kit),
-  ]
+  cores.setJoinSlot(FIRST_GAME_SLOT)
+
+  // Chaque station de jeu vit dans son propre groupe : on la retire et on libère sa mémoire GPU d'un coup.
+  let games: { holder: THREE.Group; station: Station }[] = []
+  let lineupRun = 0
+  let disposed = false
+
+  function buildStation(
+    entry: SceneEntry,
+    factory: StationFactory | null,
+    slot: number,
+    holder: THREE.Group,
+  ): Station {
+    if (entry.kind === "idle") return createIdle(holder, kit, slot)
+    if (entry.kind === "model" && factory)
+      return factory(holder, kit, slot, callouts)
+    // Jeu sans modèle, ou modèle qui n'a pas pu se télécharger : station générique.
+    const { name, color } =
+      entry.kind === "generic"
+        ? entry
+        : {
+            name: TRACKED_GAMES[entry.key].label,
+            color: TRACKED_GAMES[entry.key].hex,
+          }
+    return createGeneric(holder, kit, slot, name, color)
+  }
+
+  /** Remplace les stations de jeu. Les modèles se téléchargent d'abord ; un appel plus récent annule celui-ci. */
+  async function setLineup(entries: SceneEntry[]) {
+    const run = ++lineupRun
+    const factories = await Promise.all(
+      entries.map((entry) =>
+        entry.kind === "model"
+          ? STATION_MODELS[entry.key]().catch(() => null)
+          : null,
+      ),
+    )
+    if (run !== lineupRun || disposed) return
+
+    for (const { holder } of games) {
+      scene.remove(holder)
+      disposeScene(holder)
+    }
+    // Les textes « Flip reset » et « But ! » appartiennent à Rocket League : on les éteint s'il disparaît.
+    for (const el of [callouts.reset, callouts.goal])
+      el?.style.setProperty("opacity", "0")
+
+    games = entries.map((entry, i) => {
+      const holder = new THREE.Group()
+      scene.add(holder)
+      const station = buildStation(
+        entry,
+        factories[i],
+        FIRST_GAME_SLOT + i,
+        holder,
+      )
+      return { holder, station }
+    })
+    cores.setJoinSlot(FIRST_GAME_SLOT + entries.length)
+  }
 
   let baseZ = 9
   let mobile = false
@@ -76,6 +144,7 @@ export function createScene(canvas: HTMLCanvasElement, callouts: Callouts) {
   return {
     setMembers: cores.setMembers,
     setGames: hype.setGames,
+    setLineup,
     resize,
 
     /** v : progression lissée, t : temps, mouse : position lissée du pointeur centrée sur 0. */
@@ -90,11 +159,14 @@ export function createScene(canvas: HTMLCanvasElement, callouts: Callouts) {
       camera.lookAt(mobile ? 0 : 0.4, ly + yOff, 0)
 
       const frame: Frame = { v, t, ly, mobile, camera }
-      for (const station of stations) station.update(frame)
+      cores.update(frame)
+      hype.update(frame)
+      for (const { station } of games) station.update(frame)
       renderer.render(scene, camera)
     },
 
     dispose() {
+      disposed = true
       disposeScene(scene)
       kit.glowTex.dispose()
       renderer.dispose()

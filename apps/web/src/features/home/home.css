@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Rubik:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 
 /*
-  Accueil immersif : scène 3D fixe pilotée par le scroll (1050vh), une station par jeu sur un axe vertical.
+  Accueil immersif : scène 3D fixe pilotée par le scroll, une station par jeu joué en ce moment sur un axe vertical.
   Mots géants derrière, panneaux et widget Discord devant. Tout est scopé sous .qg.
 */
 
@@ -30,6 +30,13 @@
   --rl: #3aa0ff;
   --aniimo: #6fe0a8;
   --lol: #d4ad55;
+  --aion: #b38cff;
+  --valorant: #ff4f6e;
+  --genshin: #b9e86b;
+  --cities: #ffa94d;
+  --summoners: #ff6fd8;
+  --ffxiii: #dde7ff;
+  --fortnite: #ffe14d;
   --on: #3ba55d;
   --idle: #f0b232;
   --dnd: #ed4245;
@@ -162,6 +169,10 @@
     -webkit-backdrop-filter: blur(10px);
   }
   .steps button {
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font: inherit;
     font-size: 0.8rem;
     color: var(--muted);
@@ -667,10 +678,143 @@
     transform: scaleX(0);
     background: var(--accent);
   }
+  /* Hauteur posée par HomePage selon le nombre de stations (scroll.ts, scrollHeight). */
   .scroll-space {
     position: relative;
     z-index: 0;
-    height: 1050vh;
+  }
+
+  /* Rail latéral : passer d'une station à l'autre sans faire défiler */
+  .rail {
+    position: fixed;
+    z-index: 5;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .rail > button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--ink);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+  }
+  .rail > button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .rail svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .rail ol {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rail ol button {
+    position: relative;
+    width: 34px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .rail ol button::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--muted);
+    transition:
+      height 0.2s,
+      background 0.2s;
+  }
+  .rail ol button.on::before {
+    height: 18px;
+    background: var(--accent);
+  }
+  .rail ol span {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    color: var(--ink);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--glass);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+  .rail ol button:hover span,
+  .rail ol button:focus-visible span {
+    opacity: 1;
+  }
+
+  /* Bandeau « Nouveau » : un jeu vient d'apparaître, la page ne change que si on le demande */
+  .live-banner {
+    position: fixed;
+    z-index: 7;
+    left: 50%;
+    top: calc(70px + env(safe-area-inset-top, 0px));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    max-width: calc(100vw - 32px);
+    padding: 0.4rem 0.45rem 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-size: 0.85rem;
+  }
+  .live-banner button {
+    font: inherit;
+    font-weight: 600;
+    color: var(--night);
+    background: var(--signal);
+    border: 0;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+    flex: none;
+  }
+  .live-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--dnd);
+    box-shadow: 0 0 0 3px rgba(237, 66, 69, 0.25);
+    flex: none;
   }
 
   .callout {
@@ -704,16 +848,19 @@
   }
 
   @media (min-width: 641px) {
-    .panel[data-s="3"] {
-      left: auto;
-      right: clamp(16px, 3vw, 40px);
+    /* Laisse la place au rail latéral */
+    .widget,
+    .panel.right {
+      right: calc(clamp(16px, 3vw, 40px) + 36px);
     }
-    .word[data-s="3"] .r {
+    .panel.right {
+      left: auto;
+    }
+    .word.flip .r {
       right: auto;
       left: 3vw;
     }
-    .word[data-s="0"] .r,
-    .word[data-s="6"] .r {
+    .word.solo .r {
       display: none;
     }
   }
@@ -794,6 +941,17 @@
     }
     .hint {
       display: none;
+    }
+    .rail {
+      top: 38vh;
+      transform: none;
+    }
+    .rail ol {
+      display: none;
+    }
+    .live-banner {
+      top: calc(60px + env(safe-area-inset-top, 0px));
+      font-size: 0.78rem;
     }
   }
 

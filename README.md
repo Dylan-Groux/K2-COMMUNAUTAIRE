@@ -79,12 +79,14 @@ Les valeurs de production du front sont dans `apps/web/.env.production` (publiqu
 L'accueil (`src/features/home`) est une scène Three.js pilotée par le scroll. Sans données il affiche un exemple (badge « Exemple »).
 `VITE_WIDGET_URL` branche le widget du header, les salons vocaux et les avatars ; `VITE_STATS_URL` branche le classement « jeu du moment ». En production, les deux pointent vers les fichiers du bot QSL (`/bot/widget.json`, `/bot/stats.json`), donc le widget officiel de Discord n'est pas nécessaire. Le bouton Steam de l'accueil mène à l'annuaire `/steam`, comme l'en-tête des autres pages.
 
+`VITE_LIVE_URL` (`/bot/live.json` en production) choisit les stations de jeu de l'accueil : jusqu'à 4 jeux joués en ce moment, triés par nombre de joueurs. Le bot ne compte un jeu qu'après 3 min de présence et le garde 15 min après le départ du dernier joueur. La liste est figée au chargement ; si un jeu apparaît ensuite, un bandeau propose de l'afficher. Personne en jeu : une station de veille rappelle les horaires du serveur. Fichier absent ou vieux de plus de 5 min : les quatre jeux historiques. Un jeu sans modèle 3D reçoit une station générique à sa couleur ; pour lui créer sa station, ajoute-le à `TRACKED_GAMES` et `GAME_PANELS` (`content.ts`) et à `STATION_MODELS` (`scene/registry.ts`).
+
 ## Mise en production (o2switch)
 
 ```
 ~/k2-communautaire      ce dépôt (hors de public_html)
 ~/public_html           le front construit (copié par le script)
-~/public_html/bot       écrit par le bot QSL (EXPORT_DIR) : widget.json, stats.json, admin/
+~/public_html/bot       écrit par le bot QSL (EXPORT_DIR) : widget.json, stats.json, live.json
 api.<domaine>           l'API, application Node gérée par Passenger
 ```
 

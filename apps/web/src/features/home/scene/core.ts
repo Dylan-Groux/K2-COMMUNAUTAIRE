@@ -1,5 +1,4 @@
 import * as THREE from "three"
-import { JOIN_STATION } from "../content"
 import { sceneAlpha } from "../scroll"
 import { canvasTexture, COL, stationY, type Frame, type Kit } from "./kit"
 
@@ -16,7 +15,7 @@ const ring = (g: CanvasRenderingContext2D) => {
   g.stroke()
 }
 
-/** Stations 0 et finale : le noyau (le serveur), ses particules et les avatars des membres. */
+/** Station 0 et station finale (Rejoindre) : le noyau (le serveur), ses particules et les avatars des membres. */
 export function createCores(scene: THREE.Scene, kit: Kit) {
   const makeCore = () => {
     const group = new THREE.Group()
@@ -67,9 +66,10 @@ export function createCores(scene: THREE.Scene, kit: Kit) {
     return { group, shell, inner, ring1, ring2 }
   }
 
+  // La station finale suit le nombre de jeux à l'affiche : setJoinSlot la déplace.
+  let joinSlot = 0
   const cores = [makeCore(), makeCore()]
   cores[0].group.position.y = stationY(0)
-  cores[1].group.position.y = stationY(JOIN_STATION)
 
   // Particules en orbite autour du noyau le plus proche
   const OP = 400
@@ -85,8 +85,12 @@ export function createCores(scene: THREE.Scene, kit: Kit) {
 
   // Avatars des membres autour du noyau final
   const avatars = new THREE.Group()
-  avatars.position.y = stationY(JOIN_STATION)
   scene.add(avatars)
+
+  const setJoinSlot = (slot: number) => {
+    joinSlot = slot
+    cores[1].group.position.y = avatars.position.y = stationY(slot)
+  }
 
   /** Pastille aux initiales, remplacée par la photo de profil Discord dès qu'elle est chargée. */
   const avatarSprite = ({ name, avatarUrl }: AvatarInput) => {
@@ -132,6 +136,8 @@ export function createCores(scene: THREE.Scene, kit: Kit) {
   }
 
   return {
+    setJoinSlot,
+
     setMembers(members: AvatarInput[]) {
       for (const child of avatars.children as THREE.Sprite[]) {
         child.material.map?.dispose()
@@ -172,7 +178,7 @@ export function createCores(scene: THREE.Scene, kit: Kit) {
       orbit.commit()
       orbitMaterial.opacity = Math.max(
         sceneAlpha(0, v),
-        sceneAlpha(JOIN_STATION, v),
+        sceneAlpha(joinSlot, v),
       )
 
       for (const sprite of avatars.children) {
@@ -184,7 +190,7 @@ export function createCores(scene: THREE.Scene, kit: Kit) {
           Math.sin(ang) * d.r,
         )
       }
-      avatars.visible = sceneAlpha(JOIN_STATION, v) > 0.01
+      avatars.visible = sceneAlpha(joinSlot, v) > 0.01
     },
   }
 }

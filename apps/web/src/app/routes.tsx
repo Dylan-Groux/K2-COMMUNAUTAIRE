@@ -12,6 +12,14 @@ export const routes: RouteObject[] = [
       Component: (await import("@/features/home/HomePage")).default,
     }),
   },
+  // Vitrine de toutes les stations 3D de l'accueil, sans attendre qu'on joue à ces jeux.
+  {
+    path: "/station",
+    HydrateFallback: RouteLoader,
+    lazy: async () => ({
+      Component: (await import("@/features/home/HomePage")).StationShowcase,
+    }),
+  },
   // Annuaire : Steam par défaut, puis un jeu par onglet (/steam/valorant…)
   { path: "/steam/:slug?", Component: SteamDirectoryPage },
   { path: "/membre/:pseudo", Component: MemberPage },

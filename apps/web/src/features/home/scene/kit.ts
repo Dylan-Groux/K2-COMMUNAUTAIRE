@@ -7,6 +7,13 @@ export const COL = {
   rl: 0x3aa0ff,
   aniimo: 0x6fe0a8,
   lol: 0xd4ad55,
+  aion: 0xb38cff,
+  valorant: 0xff4f6e,
+  genshin: 0xb9e86b,
+  cities: 0xffa94d,
+  summoners: 0xff6fd8,
+  ffxiii: 0xdde7ff,
+  fortnite: 0xffe14d,
   signal: 0xff6a3d,
 }
 

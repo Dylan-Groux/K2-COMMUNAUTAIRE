@@ -1,36 +1,122 @@
 /** Contenu de l'accueil immersif : une « station » 3D par section, sur un axe vertical. */
 import { hueOf } from "./components/Avatar"
 
-export type GameKey = "apex" | "rocket" | "aniimo" | "league"
+export type GameKey =
+  | "apex"
+  | "rocket"
+  | "aniimo"
+  | "league"
+  | "aion"
+  | "valorant"
+  | "genshin"
+  | "cities"
+  | "summoners"
+  | "ffxiii"
+  | "fortnite"
 
-/** Jeux suivis, détectés par le nom d'activité Discord / Steam. */
-export const TRACKED_GAMES: Record<
-  GameKey,
-  { match: RegExp; color: string; hex: number; label: string }
-> = {
+type TrackedGame = {
+  match: RegExp
+  color: string
+  hex: number
+  label: string
+  /** Libellé court de la navigation et mots géants derrière la station. */
+  nav: string
+  words: [string, string]
+  /** Panneau à droite sur grand écran, quand l'animation occupe la gauche. */
+  panelRight?: boolean
+}
+
+/** Jeux qui ont leur station 3D (scene/registry.ts), détectés par le nom d'activité Discord / Steam. */
+export const TRACKED_GAMES: Record<GameKey, TrackedGame> = {
   apex: {
     match: /apex/i,
     color: "var(--apex)",
     hex: 0xff4d3a,
     label: "Apex Legends",
+    nav: "Apex",
+    words: ["Drop", "Apex"],
   },
   rocket: {
     match: /rocket league/i,
     color: "var(--rl)",
     hex: 0x3aa0ff,
     label: "Rocket League",
+    nav: "Rocket League",
+    words: ["Boost", "Rocket"],
+    panelRight: true,
   },
   aniimo: {
     match: /aniimo/i,
     color: "var(--aniimo)",
     hex: 0x6fe0a8,
     label: "Aniimo",
+    nav: "Aniimo",
+    words: ["Capture", "Aniimo"],
   },
   league: {
     match: /league of legends/i,
     color: "var(--lol)",
     hex: 0xd4ad55,
     label: "League of Legends",
+    nav: "LoL",
+    words: ["Nexus", "LoL"],
+  },
+  aion: {
+    match: /\baion\b/i,
+    color: "var(--aion)",
+    hex: 0xb38cff,
+    label: "AION 2",
+    nav: "AION 2",
+    words: ["Envol", "Aion"],
+  },
+  valorant: {
+    match: /valorant/i,
+    color: "var(--valorant)",
+    hex: 0xff4f6e,
+    label: "VALORANT",
+    nav: "Valorant",
+    words: ["Spike", "Valo"],
+  },
+  genshin: {
+    match: /genshin impact/i,
+    color: "var(--genshin)",
+    hex: 0xb9e86b,
+    label: "Genshin Impact",
+    nav: "Genshin",
+    words: ["Teyvat", "Genshin"],
+  },
+  cities: {
+    match: /cities:? skylines/i,
+    color: "var(--cities)",
+    hex: 0xffa94d,
+    label: "Cities: Skylines II",
+    nav: "Cities II",
+    words: ["Bâtis", "Cities"],
+  },
+  summoners: {
+    match: /summoners war/i,
+    color: "var(--summoners)",
+    hex: 0xff6fd8,
+    label: "Summoners War",
+    nav: "Summoners War",
+    words: ["Invoque", "Runes"],
+  },
+  ffxiii: {
+    // XIII seul : XIII-2 et Lightning Returns sont d'autres jeux.
+    match: /^final fantasy xiii$/i,
+    color: "var(--ffxiii)",
+    hex: 0xdde7ff,
+    label: "FINAL FANTASY XIII",
+    nav: "FF XIII",
+    words: ["Cristal", "FF XIII"],
+  },
+  fortnite: {
+    match: /fortnite/i,
+    color: "var(--fortnite)",
+    hex: 0xffe14d,
+    label: "Fortnite",
+    nav: "Fortnite",
+    words: ["Build", "Fortnite"],
   },
 }
 
@@ -55,64 +141,106 @@ export function gameColorOf(name: string): {
   return { color, hex: color }
 }
 
-/** Sections dans l'ordre du scroll. `words` = mots géants derrière la scène. */
-export const STATIONS = [
-  { nav: "Accueil", accent: "var(--cyan)", words: ["QSL", "le QG"] },
-  { nav: "Top 48 h", accent: "var(--signal)", words: ["Hype", "48 h"] },
-  { nav: "Apex", accent: "var(--apex)", words: ["Drop", "Apex"] },
-  { nav: "Rocket League", accent: "var(--rl)", words: ["Boost", "Rocket"] },
-  { nav: "Aniimo", accent: "var(--aniimo)", words: ["Capture", "Aniimo"] },
-  { nav: "LoL", accent: "var(--lol)", words: ["Nexus", "LoL"] },
-  {
-    nav: "Rejoindre",
-    accent: "var(--signal)",
-    words: ["Rejoins", "la partie"],
-  },
-] as const
+/** Une section du scroll. `words` = mots géants derrière la scène, `solo` = un seul mot sur grand écran. */
+export type StationView = {
+  id: string
+  nav: string
+  accent: string
+  words: [string, string]
+  solo?: boolean
+  panelRight?: boolean
+}
 
-export const JOIN_STATION = STATIONS.length - 1
+/** Accueil, Top 48 h et Rejoindre sont toujours là ; entre les deux, les jeux joués en ce moment (stations.ts). */
+export const HOME_STATION: StationView = {
+  id: "home",
+  nav: "Accueil",
+  accent: "var(--cyan)",
+  words: ["QSL", "le QG"],
+  solo: true,
+}
+export const HYPE_STATION: StationView = {
+  id: "hype",
+  nav: "Top 48 h",
+  accent: "var(--signal)",
+  words: ["Hype", "48 h"],
+}
+/** Affichée à la place des jeux quand personne ne joue. */
+export const IDLE_STATION: StationView = {
+  id: "idle",
+  nav: "En veille",
+  accent: "var(--cyan)",
+  words: ["Repasse", "ce soir"],
+}
+export const JOIN_STATION: StationView = {
+  id: "join",
+  nav: "Rejoindre",
+  accent: "var(--signal)",
+  words: ["Rejoins", "la partie"],
+  solo: true,
+}
 
-export const GAME_PANELS: {
-  station: number
-  game: GameKey
-  eyebrow: string
-  title: string
-  text: string
-  chips: string[]
-}[] = [
-  {
-    station: 2,
-    game: "apex",
-    eyebrow: "01 · Apex Legends",
+/** Texte des jeux qui ont leur station. Un jeu sans station a un panneau générique (Panels.tsx). */
+export const GAME_PANELS: Record<
+  GameKey,
+  { title: string; text: string; chips: string[] }
+> = {
+  apex: {
     title: "Battle royale nerveux, à jouer en squad.",
     text: "Trois légendes, des compétences qui se complètent et une zone qui se referme. Le jeu le plus joué du serveur, en casual comme en ranked.",
     chips: ["Battle royale", "Trio", "Free-to-play"],
   },
-  {
-    station: 3,
-    game: "rocket",
-    eyebrow: "02 · Rocket League",
+  rocket: {
     title: "Du foot, des voitures et des flip resets.",
     text: "Des matchs de cinq minutes où chaque but peut se jouer dans les airs. Facile à prendre en main, presque impossible à maîtriser.",
     chips: ["Sport", "1v1 · 2v2 · 3v3", "Free-to-play"],
   },
-  {
-    station: 4,
-    game: "aniimo",
-    eyebrow: "03 · Aniimo",
+  aniimo: {
     title: "Un monde ouvert à explorer et des créatures à capturer.",
     text: "On parcourt les terres, on capture et on fait évoluer ses Aniimo, seul ou en coop avec les autres membres du serveur.",
     chips: ["Monde ouvert", "Capture", "Coop"],
   },
-  {
-    station: 5,
-    game: "league",
-    eyebrow: "04 · League of Legends",
+  league: {
     title: "Le MOBA de référence, en 5v5.",
     text: "Plus de 160 champions, trois lanes et un Nexus à détruire. Des parties normales pour s’amuser aux ranked pour grimper.",
     chips: ["MOBA", "5v5", "Free-to-play"],
   },
-]
+  aion: {
+    title: "Un MMORPG où l'on se bat jusque dans le ciel.",
+    text: "Le MMORPG de NCSOFT : des Daevas ailés, des îles suspendues à explorer et des donjons à faire en groupe.",
+    chips: ["MMORPG", "Vol", "Groupe"],
+  },
+  valorant: {
+    title: "Du 5v5 tactique où chaque balle compte.",
+    text: "Le FPS de Riot Games : des agents aux capacités uniques, une Spike à poser ou à désamorcer, et des rounds qui se jouent à un tir près.",
+    chips: ["FPS tactique", "5v5", "Free-to-play"],
+  },
+  genshin: {
+    title: "Un monde ouvert à parcourir, seul ou à quatre.",
+    text: "Le RPG d'action de HoYoverse : le continent de Teyvat, sept éléments qui se combinent en réactions, et de la coop jusqu'à quatre joueurs.",
+    chips: ["RPG d'action", "Monde ouvert", "Free-to-play"],
+  },
+  cities: {
+    title: "Une ville à construire, rue après rue.",
+    text: "Le city-builder de Colossal Order : zoner les quartiers, tracer les routes, gérer la circulation et regarder la ville grandir.",
+    chips: ["Gestion", "City-builder", "Solo"],
+  },
+  summoners: {
+    title: "Des monstres à invoquer et des runes à optimiser.",
+    text: "Le RPG au tour par tour de Com2uS : invoquer des monstres de cinq éléments, leur équiper des runes et les envoyer dans l'arène.",
+    chips: ["Tour par tour", "Mobile", "PvP"],
+  },
+  ffxiii: {
+    title: "Un RPG entre deux mondes, Cocoon et Gran Pulse.",
+    text: "L'épisode de Square Enix mené par Lightning : le monde suspendu de Cocoon, les terres sauvages de Gran Pulse et des combats rythmés par les changements de stratégie.",
+    chips: ["RPG", "Solo", "Square Enix"],
+  },
+  fortnite: {
+    title: "Cent joueurs, une île et de quoi construire.",
+    text: "Le battle royale d'Epic Games : on saute du bus, on construit pour se protéger et on tient jusqu'à la dernière place.",
+    chips: ["Battle royale", "Construction", "Free-to-play"],
+  },
+}
 
 /** Le serveur est actif tous les soirs ; vendredi et samedi, plus de monde et plus tard. */
 export const ACTIVE_HOURS = "18:30 – 00:00"
@@ -146,3 +274,5 @@ export const WIDGET_URL =
     ? `https://discord.com/api/guilds/${DISCORD_GUILD_ID}/widget.json`
     : "")
 export const STATS_URL = import.meta.env.VITE_STATS_URL || ""
+/** Jeux joués en ce moment, écrits chaque minute par le bot (live.json). Vide = données d'exemple. */
+export const LIVE_URL = import.meta.env.VITE_LIVE_URL || ""

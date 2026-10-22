@@ -1,15 +1,11 @@
 import { useState } from "react"
 import { Link } from "react-router"
-import {
-  ACTIVE_HOURS,
-  JOIN_STATION,
-  PEAK_HOURS,
-  SCHEDULE,
-  todayIndex,
-} from "../content"
+import { ACTIVE_HOURS, PEAK_HOURS, SCHEDULE, todayIndex } from "../content"
 import { cssVars } from "./Avatar"
 
-export function JoinSection({ inviteUrl }: { inviteUrl: string }) {
+type Props = { inviteUrl: string; station: number }
+
+export function JoinSection({ inviteUrl, station }: Props) {
   const [toast, setToast] = useState("")
   const today = todayIndex()
   const label = inviteUrl.replace(/^https?:\/\//, "")
@@ -24,7 +20,7 @@ export function JoinSection({ inviteUrl }: { inviteUrl: string }) {
   }
 
   return (
-    <section className="final off" data-s={JOIN_STATION} id="rejoindre">
+    <section className="final off" data-s={station} id="rejoindre">
       <div className="weekwrap">
         <div className="week">
           {SCHEDULE.map((slot, i) => (

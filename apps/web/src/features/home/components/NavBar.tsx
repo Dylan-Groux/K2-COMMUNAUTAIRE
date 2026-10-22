@@ -1,10 +1,10 @@
 import { Link } from "react-router"
-import { STATIONS, JOIN_STATION } from "../content"
-import { scrollToStation } from "../useScrollStage"
+import type { StationView } from "../content"
+import { scrollToJoin, scrollToStation } from "../useScrollStage"
 
-type Props = { active: number; online: number }
+type Props = { stations: StationView[]; active: number; online: number }
 
-export function NavBar({ active, online }: Props) {
+export function NavBar({ stations, active, online }: Props) {
   return (
     <nav className="nav">
       <a
@@ -17,13 +17,15 @@ export function NavBar({ active, online }: Props) {
       >
         QSL<small>QG GAMING · FR</small>
       </a>
-      <ol className="steps" aria-label="Sections">
-        {STATIONS.map((station, i) => (
-          <li key={station.nav}>
+      {/* Au-delà de 8 sections (page /station), la barre déborderait : le rail latéral suffit. */}
+      <ol className="steps" aria-label="Sections" hidden={stations.length > 8}>
+        {stations.map((station, i) => (
+          <li key={station.id}>
             <button
               type="button"
               className={i === active ? "on" : ""}
               onClick={() => scrollToStation(i)}
+              title={station.nav}
             >
               {station.nav}
             </button>
@@ -42,11 +44,7 @@ export function NavBar({ active, online }: Props) {
         <Link className="ghost steam-btn" to="/steam">
           Steam
         </Link>
-        <button
-          className="join nav-join"
-          type="button"
-          onClick={() => scrollToStation(JOIN_STATION)}
-        >
+        <button className="join nav-join" type="button" onClick={scrollToJoin}>
           Rejoindre
         </button>
       </div>

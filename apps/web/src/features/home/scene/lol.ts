@@ -2,11 +2,15 @@ import * as THREE from "three"
 import { fract, localProgress } from "../scroll"
 import { COL, stationY, type Frame, type Kit, type Station } from "./kit"
 
-/** Station 5 : cristal du Nexus et sbires sur trois lanes. */
-export function createLol(scene: THREE.Scene, kit: Kit): Station {
+/** Station LoL : cristal du Nexus et sbires sur trois lanes. */
+export function createLol(
+  parent: THREE.Object3D,
+  kit: Kit,
+  slot: number,
+): Station {
   const group = new THREE.Group()
-  group.position.y = stationY(5)
-  scene.add(group)
+  group.position.y = stationY(slot)
+  parent.add(group)
 
   const stone = new THREE.MeshStandardMaterial({
     color: 0x262c45,
@@ -98,7 +102,7 @@ export function createLol(scene: THREE.Scene, kit: Kit): Station {
 
   return {
     update({ v, t }: Frame) {
-      const ll = localProgress(5, v)
+      const ll = localProgress(slot, v)
       group.rotation.y = 0.3 + v * 0.8
       crystal.rotation.y = t * 0.5
       crystal.position.y = 0.45 + Math.sin(t * 1.4) * 0.08
